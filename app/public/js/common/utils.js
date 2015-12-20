@@ -1,3 +1,7 @@
+/*
+	Frame Actuator
+		used for calling frames limited by fps
+*/
 
 var FrameActuator = function(fps, callback){
 	this.fps = fps;
@@ -28,7 +32,10 @@ FrameActuator.prototype.runFrame = function(){
 	}
 }
 
-
+/*
+	Input
+		used for handling relevent input events
+*/
 
 var Input = function(){
 	this.forward = false;
@@ -64,4 +71,24 @@ Input.prototype.onKeyUp = function(event){
 			this.backward = false;
 			break;
 	}
+}
+
+/*
+	CommunicationClient
+		used for handling communication protocols with server
+*/
+
+var CommunicationClient = function(){
+	this.ws = new WebSocket(this.getUrl());
+
+	var that = this;
+	this.ws.onopen = function(event){
+		console.log("connected with server");
+		that.ws.send("hello");
+	}
+}
+CommunicationClient.prototype.getUrl = function(){
+	var url = "ws://" + window.location.host + "/event";
+	console.log("using server url: " + url);
+	return url;
 }

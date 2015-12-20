@@ -83,6 +83,8 @@ $(document).ready(function(){
 		}
 
 	}).begin();
+
+	var communicationClient = new CommunicationClient();
 });
 
 
