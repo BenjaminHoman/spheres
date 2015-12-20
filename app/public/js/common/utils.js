@@ -40,6 +40,10 @@ FrameActuator.prototype.runFrame = function(){
 var Input = function(){
 	this.forward = false;
 	this.backward = false;
+	this.left = false;
+	this.right = false;
+	this.up = false;
+	this.down = false;
 
 	this.init();
 }
@@ -60,6 +64,18 @@ Input.prototype.onKeydown = function(event){
 		case 83: //S
 			this.backward = true;
 			break;
+		case 65: //A
+			this.left = true;
+			break;
+		case 68: //D
+			this.right = true;
+			break;
+		case 82: //R
+			this.up = true;
+			break;
+		case 70: //F
+			this.down = true;
+			break;
 	}
 }
 Input.prototype.onKeyUp = function(event){
@@ -69,6 +85,18 @@ Input.prototype.onKeyUp = function(event){
 			break;
 		case 83: //S
 			this.backward = false;
+			break;
+		case 65: //A
+			this.left = false;
+			break;
+		case 68: //D
+			this.right = false;
+			break;
+		case 82: //R
+			this.up = false;
+			break;
+		case 70: //F
+			this.down = false;
 			break;
 	}
 }

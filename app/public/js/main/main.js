@@ -76,10 +76,22 @@ $(document).ready(function(){
 		graphicsContext.render();
 
 		if (input.forward){
-			graphicsContext.sphere.position.z -= 0.5 * delta;
+			graphicsContext.camera.position.z -= 0.5 * delta;
 		}
 		if (input.backward){
-			graphicsContext.sphere.position.z += 0.5 * delta;
+			graphicsContext.camera.position.z += 0.5 * delta;
+		}
+		if (input.left){
+			graphicsContext.camera.position.x -= 0.5 * delta;
+		}
+		if (input.right){
+			graphicsContext.camera.position.x += 0.5 * delta;
+		}
+		if (input.up){
+			graphicsContext.camera.position.y += 0.5 * delta;
+		}
+		if (input.down){
+			graphicsContext.camera.position.y -= 0.5 * delta;
 		}
 
 	}).begin();
