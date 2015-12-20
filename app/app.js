@@ -1,11 +1,13 @@
 var express = require('express');
 var app = express();
 var expressWs = require('express-ws')(app);
+var favicon = require('serve-favicon');
 var World = require('./private/World.js');
 
 var world = new World.World();
 
 app.use(express.static('public'));
+app.use(favicon(__dirname + '/public/img/favicon.ico'));
 
 app.ws('/event', function(ws, req) {
 	world.handleClientConnect(ws);
