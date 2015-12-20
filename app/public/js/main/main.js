@@ -24,10 +24,8 @@ GraphicsContext.prototype.init = function(){
 	this.camera = new THREE.PerspectiveCamera(this.VIEWPORT.viewAngle, this.VIEWPORT.width / this.VIEWPORT.height, this.VIEWPORT.near, this.VIEWPORT.far);
 	this.scene = new THREE.Scene();
 
-	this.light = new THREE.PointLight(0xFFFFFF);
-	this.light.position.x = 10;
-	this.light.position.y = 50;
-	this.light.position.z = 130;
+	this.light = new THREE.DirectionalLight(0xffffff, 1.0);
+	this.light.position.set(0.2, 0.7, 1);
 	this.scene.add(this.light);
 
 	this.scene.add(this.camera);
@@ -41,9 +39,9 @@ GraphicsContext.prototype.init = function(){
 	console.log("GraphicsContext init");
 }
 GraphicsContext.prototype.initDemoMeshes = function(){
-	var radius = 50;
-	var segments = 16;
-	var rings = 16;
+	var radius = 30;
+	var segments = 10;
+	var rings = 10;
 
 	var sphereMaterial = new THREE.MeshLambertMaterial({
 		color: 0xCC00CC,
@@ -65,26 +63,26 @@ GraphicsContext.prototype.render = function(){
 }
 
 $(document).ready(function(){
+	var input = new Input();
+
 	graphicsContext = new GraphicsContext();
 	graphicsContext.initDemoMeshes();
-	
-	var frameActuator = new FrameActuator(60, graphicsContext);
-	frameActuator.beginRenderLoop();
 
-	//Event listeners
-	$(window).on('keydown', function(e){
-		switch (e.keyCode){
-			case 87:
-				graphicsContext.sphere.position.z -= 10;
-				break;
-			case 38:
-				graphicsContext.light.position.x += 5;
-				break;
-		}
-	});
 	$(window).on('resize',function(e){
 		graphicsContext.resize();
 	});
+	
+	new FrameActuator(60, function(delta){
+		graphicsContext.render();
+
+		if (input.forward){
+			graphicsContext.sphere.position.z -= 0.5 * delta;
+		}
+		if (input.backward){
+			graphicsContext.sphere.position.z += 0.5 * delta;
+		}
+
+	}).begin();
 });
 
 
