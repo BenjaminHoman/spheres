@@ -37,6 +37,7 @@ FrameActuator.prototype.runFrame = function(){
 		used for handling relevent input events
 */
 
+var input = null;
 var Input = function(){
 	this.forward = false;
 	this.backward = false;
@@ -106,6 +107,7 @@ Input.prototype.onKeyUp = function(event){
 		used for handling communication protocols with server
 */
 
+var communicationClient = null;
 var CommunicationClient = function(){
 	this.ws = new WebSocket(this.getUrl());
 
@@ -113,6 +115,14 @@ var CommunicationClient = function(){
 	this.ws.onopen = function(event){
 		console.log("connected with server");
 		that.ws.send("hello");
+	}
+	this.ws.onmessage = function(event){
+		var data = JSON.parse(event.data);
+		switch (data.type){
+			case 'stateDiff':
+				state.mergeDiffState(data);
+				break;
+		}
 	}
 }
 CommunicationClient.prototype.getUrl = function(){

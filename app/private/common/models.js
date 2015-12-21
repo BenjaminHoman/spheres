@@ -4,7 +4,6 @@ var uuid = require("node-uuid");
 	Client
 		represents a client...
 */
-
 var Client = function(){
 	this.id = uuid.v1();
 }
@@ -13,6 +12,15 @@ Client.prototype.debug = function(){
 }
 exports.Client = Client;
 
+/*
+	StateDiff
+		holds information about the differences of each sphere in the scene
+*/
+var StateDiff = function(){
+	this.type = 'stateDiff';
+	this.spheres = [];
+}
+exports.StateDiff = StateDiff;
 
 
 /*

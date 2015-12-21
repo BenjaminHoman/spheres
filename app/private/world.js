@@ -46,6 +46,12 @@ World.prototype.handleClientConnect = function(ws){
 	ws.client.debug();
 
 	this.clients.push(ws);
+
+	var stateDiff = new Models.StateDiff();
+	stateDiff.spheres.push(new Models.Sphere(new Models.Vec3(3,3,3), 5));
+	stateDiff.spheres.push(new Models.Sphere(new Models.Vec3(10,6,3), 2));
+	stateDiff.spheres.push(new Models.Sphere(new Models.Vec3(20,3,3), 7));
+	ws.send(JSON.stringify(stateDiff));
 }
 World.prototype.handleClientMessage = function(ws, msg){
 	console.log("client message: " + msg);
@@ -97,7 +103,7 @@ World.prototype.unassignFromSegment = function(sphere){
 	}
 }
 /*
-	find all spheres that intersect with passed
+	find all spheres that intersect with arg
 */
 World.prototype.intersects = function(sphere){
 	var spheres = [];
