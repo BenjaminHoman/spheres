@@ -10,16 +10,22 @@ $(document).ready(function(){
 		graphicsContext.render();
 
 		if (input.forward){
-			graphicsContext.camera.position.z -= 0.5 * delta;
+			var forward = graphicsContext.camera.getWorldDirection();
+			graphicsContext.camera.position.z += forward.z * 0.5 * delta;
+			graphicsContext.camera.position.y += forward.y * 0.5 * delta;
+			graphicsContext.camera.position.x += forward.x * 0.5 * delta;
 		}
 		if (input.backward){
-			graphicsContext.camera.position.z += 0.5 * delta;
+			var forward = graphicsContext.camera.getWorldDirection();
+			graphicsContext.camera.position.z -= forward.z * 0.5 * delta;
+			graphicsContext.camera.position.y -= forward.y * 0.5 * delta;
+			graphicsContext.camera.position.x -= forward.x * 0.5 * delta;
 		}
 		if (input.left){
-			graphicsContext.camera.position.x -= 0.5 * delta;
+			graphicsContext.camera.rotation.y += 0.001 * delta;
 		}
 		if (input.right){
-			graphicsContext.camera.position.x += 0.5 * delta;
+			graphicsContext.camera.rotation.y -= 0.001 * delta;
 		}
 		if (input.up){
 			graphicsContext.camera.position.y += 0.5 * delta;
@@ -27,6 +33,9 @@ $(document).ready(function(){
 		if (input.down){
 			graphicsContext.camera.position.y -= 0.5 * delta;
 		}
+
+		if (state)
+			state.animate(delta);
 
 	}).begin();
 

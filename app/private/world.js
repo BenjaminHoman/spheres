@@ -35,11 +35,50 @@ var World = function(){
 	this.clients = [];
 
 	this.pos = new Models.Vec3(0,0,0);
-	this.size = new Models.Vec3(30,30,30);
+	this.size = new Models.Vec3(100,100,100);
 
 	this.segmentSize = new Models.Vec3(10,10,10);
 	this.segmentAmnt = Utils.convertToUnitSpace(this.size, this.segmentSize);
 	this.segments = [];
+	this.spheres = [];
+
+	this.init();
+	var that = this;
+	setInterval(function(){
+		that.update();
+
+	}, 300);
+}
+World.prototype.update = function(){
+	this.beginUpdate();
+
+	this.spheres[0].pos.x += 3;
+	this.spheres[0].pos.y += 2;
+	this.spheres[0].updatedPosition = true;
+
+	this.spheres[2].pos.x += 5;
+	this.spheres[2].updatedPosition = true;
+
+	var stateDiff = new Models.StateDiff();
+	stateDiff.spheres.push(this.spheres[0]);
+	stateDiff.spheres.push(this.spheres[2]);
+
+	this.broadcast(stateDiff);
+	this.endUpdate();
+}
+World.prototype.init = function(){
+	for (var z = this.pos.z; z < this.pos.z + this.size.z; z += this.segmentSize.z){
+		for (var y = this.pos.y; y < this.pos.y + this.size.y; y += this.segmentSize.y){
+			for (var x = this.pos.x; x < this.pos.x + this.size.x; x += this.segmentSize.x){
+				var segment = new Segment(new Models.Vec3(x,y,z), this.segmentSize);
+				this.segments.push(segment);
+			}
+		}
+	}
+
+	this.spheres.push(new Models.Sphere(new Models.Vec3(3,3,3), 5));
+	this.spheres.push(new Models.Sphere(new Models.Vec3(10,6,3), 2));
+	this.spheres.push(new Models.Sphere(new Models.Vec3(20,3,3), 7));
 }
 World.prototype.handleClientConnect = function(ws){
 	ws.client = new Models.Client();
@@ -48,9 +87,8 @@ World.prototype.handleClientConnect = function(ws){
 	this.clients.push(ws);
 
 	var stateDiff = new Models.StateDiff();
-	stateDiff.spheres.push(new Models.Sphere(new Models.Vec3(3,3,3), 5));
-	stateDiff.spheres.push(new Models.Sphere(new Models.Vec3(10,6,3), 2));
-	stateDiff.spheres.push(new Models.Sphere(new Models.Vec3(20,3,3), 7));
+	stateDiff.spheres = this.spheres;
+
 	ws.send(JSON.stringify(stateDiff));
 }
 World.prototype.handleClientMessage = function(ws, msg){
@@ -67,16 +105,6 @@ World.prototype.removeClientWithWs = function(ws){
 		}
 	}
 	console.error("trying to remove client that is not connected");
-}
-World.prototype.init = function(){
-	for (var z = this.pos.z; z < this.pos.z + this.size.z; z += this.segmentSize.z){
-		for (var y = this.pos.y; y < this.pos.y + this.size.y; y += this.segmentSize.y){
-			for (var x = this.pos.x; x < this.pos.x + this.size.x; x += this.segmentSize.x){
-				var segment = new Segment(new Models.Vec3(x,y,z), this.segmentSize);
-				this.segments.push(segment);
-			}
-		}
-	}
 }
 World.prototype.getSegmentIndex = function(sphere){
 	var unitPos = Utils.convertToUnitSpace(sphere.pos, this.segmentSize);
@@ -95,11 +123,29 @@ World.prototype.assignToSegment = function(sphere){
 World.prototype.unassignFromSegment = function(sphere){
 	var segmentIndex = this.getSegmentIndex(sphere);
 	var segment = this.segments[segmentIndex];
-	for (var i = 0; i < segment.spheres.length; ++i){
-		if (segment.spheres[i].id == sphere.id){
-			segment.spheres.splice(i, 1);
-			return;
+	if (segment){
+		for (var i = 0; i < segment.spheres.length; ++i){
+			if (segment.spheres[i].id == sphere.id){
+				segment.spheres.splice(i, 1);
+				return;
+			}
 		}
+	}
+}
+World.prototype.assigneSpheresToSegments = function(){
+	for (var i = 0; i < this.spheres.length; ++i){
+		if (this.spheres[i].updatedPosition){
+			this.unassignFromSegment(this.spheres[i]);
+			this.assignToSegment(this.spheres[i]);
+		}
+	}
+}
+World.prototype.beginUpdate = function(){
+	this.assigneSpheresToSegments();
+}
+World.prototype.endUpdate = function(){
+	for (var i = 0; i < this.spheres.length; ++i){
+		this.spheres[i].updatedPosition = false;
 	}
 }
 /*
@@ -119,6 +165,12 @@ World.prototype.intersects = function(sphere){
 		}
 	}
 	return spheres;
+}
+World.prototype.broadcast = function(data){
+	var strData = JSON.stringify(data);
+	for (var i = 0; i < this.clients.length; ++i){
+		this.clients[i].send(strData);
+	}
 }
 World.prototype.debug = function(){
 	for (var i = 0; i < this.segments.length; ++i){

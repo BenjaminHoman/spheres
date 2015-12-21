@@ -33,12 +33,13 @@ GraphicsContext.prototype.init = function(){
 	this.camera.position.z = 300;
 
 	this.renderer.setSize(this.VIEWPORT.width, this.VIEWPORT.height);
+	this.renderer.setClearColor(0xffffff, 1);
 
 	this.container.append(this.renderer.domElement);
 
 	console.log("GraphicsContext init");
 }
-GraphicsContext.prototype.addSphere = function(sphere){
+GraphicsContext.prototype.createSphere = function(sphere){
 	var radius = sphere.radius;
 	var segments = 10;
 	var rings = 10;
@@ -51,11 +52,10 @@ GraphicsContext.prototype.addSphere = function(sphere){
 	sphereMesh.position.z = sphere.pos.z;
 	sphereMesh.name = sphere.id;
 	this.scene.add(sphereMesh);
+	return sphereMesh;
 }
-GraphicsContext.prototype.removeSphere = function(sphere){
-	var sphereMesh = this.scene.getObjectByName(sphere.id);
-	if (sphereMesh)
-    	this.scene.remove(sphereMesh);
+GraphicsContext.prototype.removeSphere = function(sphereMesh){
+    this.scene.remove(sphereMesh);
 }
 GraphicsContext.prototype.resize = function(){
 	this.VIEWPORT.width = window.innerWidth;

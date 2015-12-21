@@ -114,7 +114,6 @@ var CommunicationClient = function(){
 	var that = this;
 	this.ws.onopen = function(event){
 		console.log("connected with server");
-		that.ws.send("hello");
 	}
 	this.ws.onmessage = function(event){
 		var data = JSON.parse(event.data);
