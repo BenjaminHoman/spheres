@@ -14,8 +14,6 @@ var GraphicsContext = function(){
 	this.scene = null;
 	this.light = null;
 
-	this.sphere = null;
-
 	this.init();
 }
 GraphicsContext.prototype.init = function(){
@@ -27,8 +25,12 @@ GraphicsContext.prototype.init = function(){
 	this.light = new THREE.DirectionalLight(0xffffff, 1.0);
 	this.light.position.set(0.2, 0.7, 1);
 	this.scene.add(this.light);
-
 	this.scene.add(this.camera);
+
+	//demo
+	this.createSphereMesh({pos: {x:5, y:5, z:5}, radius: 4});
+	this.createSphereMesh({pos: {x:10, y:10, z:5}, radius: 8});
+	this.createSphereMesh({pos: {x:19, y:3, z:8}, radius: 10});
 
 	this.camera.position.z = 300;
 
@@ -36,10 +38,9 @@ GraphicsContext.prototype.init = function(){
 	this.renderer.setClearColor(0xffffff, 1);
 
 	this.container.append(this.renderer.domElement);
-
 	console.log("GraphicsContext init");
 }
-GraphicsContext.prototype.createSphere = function(sphere){
+GraphicsContext.prototype.createSphereMesh = function(sphere){
 	var radius = sphere.radius;
 	var segments = 10;
 	var rings = 10;
@@ -54,13 +55,12 @@ GraphicsContext.prototype.createSphere = function(sphere){
 	this.scene.add(sphereMesh);
 	return sphereMesh;
 }
-GraphicsContext.prototype.removeSphere = function(sphereMesh){
+GraphicsContext.prototype.removeSphereMesh = function(sphereMesh){
     this.scene.remove(sphereMesh);
 }
 GraphicsContext.prototype.resize = function(){
 	this.VIEWPORT.width = window.innerWidth;
 	this.VIEWPORT.height = window.innerHeight;
-
 	this.renderer.setSize(window.innerWidth, window.innerHeight);
 	this.camera.aspect = this.VIEWPORT.width / this.VIEWPORT.height;
 	this.camera.updateProjectionMatrix();

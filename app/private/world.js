@@ -2,44 +2,19 @@ var Models = require("./common/models.js");
 var Utils = require("./common/utils.js");
 
 /*
-	Segment
-		contains spheres
-*/
-var Segment = function(pos, size){
-	this.spheres = [];
-	this.size = size;
-	this.pos = pos;
-}
-Segment.prototype.intersects = function(sphere){
-	var intersectingSpheres = [];
-
-	for (var i = 0; i < this.spheres.length; ++i){
-		if (sphere.id != this.spheres[i].id && this.spheres[i].intersects(sphere)){
-			intersectingSpheres.push(this.spheres[i]);
-		}
-	}
-	return intersectingSpheres;
-}
-Segment.prototype.containsPosition = function(pos){
-	return (pos.x >= this.pos.x && pos.x < this.pos.x+this.size.x && pos.y >= this.pos.y && pos.y < this.pos.y+this.size.y && pos.z >= this.pos.z && pos.z < this.pos.z+this.size.z);
-}
-Segment.prototype.debug = function(){
-	console.log("pos: ", JSON.stringify(this.pos) + " size " + JSON.stringify(this.size) + " " + JSON.stringify(this.spheres));
-}
-
-/*
 	World
 		holds references to all web sockets wich have client object tacked to them
 */
 var World = function(){
+	/*
+		list of web sockets that are currently connected.
+			they will have a client obj tacked on to them
+	*/
 	this.clients = [];
 
-	this.pos = new Models.Vec3(0,0,0);
-	this.size = new Models.Vec3(100,100,100);
-
-	this.segmentSize = new Models.Vec3(10,10,10);
-	this.segmentAmnt = Utils.convertToUnitSpace(this.size, this.segmentSize);
-	this.segments = [];
+	/*
+		list of all spheres in the world
+	*/
 	this.spheres = [];
 
 	this.init();
@@ -49,37 +24,23 @@ var World = function(){
 
 	}, 300);
 }
+/*
+	recurring execution
+*/
 World.prototype.update = function(){
-	this.beginUpdate();
 
-	this.spheres[0].pos.x += 3;
-	this.spheres[0].pos.y += 2;
-	this.spheres[0].updatedPosition = true;
-
-	this.spheres[2].pos.x += 5;
-	this.spheres[2].updatedPosition = true;
-
-	var stateDiff = new Models.StateDiff();
-	stateDiff.spheres.push(this.spheres[0]);
-	stateDiff.spheres.push(this.spheres[2]);
-
-	this.broadcast(stateDiff);
-	this.endUpdate();
 }
+/*
+	init world
+*/
 World.prototype.init = function(){
-	for (var z = this.pos.z; z < this.pos.z + this.size.z; z += this.segmentSize.z){
-		for (var y = this.pos.y; y < this.pos.y + this.size.y; y += this.segmentSize.y){
-			for (var x = this.pos.x; x < this.pos.x + this.size.x; x += this.segmentSize.x){
-				var segment = new Segment(new Models.Vec3(x,y,z), this.segmentSize);
-				this.segments.push(segment);
-			}
-		}
-	}
-
-	this.spheres.push(new Models.Sphere(new Models.Vec3(3,3,3), 5));
-	this.spheres.push(new Models.Sphere(new Models.Vec3(10,6,3), 2));
-	this.spheres.push(new Models.Sphere(new Models.Vec3(20,3,3), 7));
+	this.spheres.push(new Models.Sphere(new Models.Vec3(10,12,3), 5));
+	this.spheres.push(new Models.Sphere(new Models.Vec3(10,6,3), 3));
+	this.spheres.push(new Models.Sphere(new Models.Vec3(10,44,3), 8));
 }
+/*
+	client connect event
+*/
 World.prototype.handleClientConnect = function(ws){
 	ws.client = new Models.Client();
 	ws.client.debug();
@@ -91,12 +52,21 @@ World.prototype.handleClientConnect = function(ws){
 
 	ws.send(JSON.stringify(stateDiff));
 }
+/*
+	Client sends data event
+*/
 World.prototype.handleClientMessage = function(ws, msg){
 	console.log("client message: " + msg);
 }
+/*
+	Client Disconnects
+*/
 World.prototype.handleClientDisconnect = function(ws){
 	this.removeClientWithWs(ws);
 }
+/*
+	remove web socket from client list
+*/
 World.prototype.removeClientWithWs = function(ws){
 	for (var i = 0; i < this.clients.length; ++i){
 		if (this.clients[i] == ws){
@@ -106,66 +76,9 @@ World.prototype.removeClientWithWs = function(ws){
 	}
 	console.error("trying to remove client that is not connected");
 }
-World.prototype.getSegmentIndex = function(sphere){
-	var unitPos = Utils.convertToUnitSpace(sphere.pos, this.segmentSize);
-	return Utils.getIndex(unitPos, this.segmentAmnt);
-}
 /*
-	assign to segment based on the calculated index
+	send data to all connected clients
 */
-World.prototype.assignToSegment = function(sphere){
-	var segmentIndex = this.getSegmentIndex(sphere);
-	this.segments[segmentIndex].spheres.push(sphere);
-}
-/*
-	unassign to segment based on the calculated index and sphere id
-*/
-World.prototype.unassignFromSegment = function(sphere){
-	var segmentIndex = this.getSegmentIndex(sphere);
-	var segment = this.segments[segmentIndex];
-	if (segment){
-		for (var i = 0; i < segment.spheres.length; ++i){
-			if (segment.spheres[i].id == sphere.id){
-				segment.spheres.splice(i, 1);
-				return;
-			}
-		}
-	}
-}
-World.prototype.assigneSpheresToSegments = function(){
-	for (var i = 0; i < this.spheres.length; ++i){
-		if (this.spheres[i].updatedPosition){
-			this.unassignFromSegment(this.spheres[i]);
-			this.assignToSegment(this.spheres[i]);
-		}
-	}
-}
-World.prototype.beginUpdate = function(){
-	this.assigneSpheresToSegments();
-}
-World.prototype.endUpdate = function(){
-	for (var i = 0; i < this.spheres.length; ++i){
-		this.spheres[i].updatedPosition = false;
-	}
-}
-/*
-	find all spheres that intersect with arg
-*/
-World.prototype.intersects = function(sphere){
-	var spheres = [];
-
-	var unitPos = Utils.convertToUnitSpace(sphere.pos, this.segmentSize);
-	for (var i = 0; i < Utils.adjacentDirections.length; ++i){
-		var adjacentPos = unitPos.add(Utils.adjacentDirections[i]);
-		var segment = this.segments[Utils.getIndex(adjacentPos, this.segmentAmnt)];
-
-		if (segment){
-			var intersectingSpheres = segment.intersects(sphere);
-			spheres = spheres.concat(intersectingSpheres);
-		}
-	}
-	return spheres;
-}
 World.prototype.broadcast = function(data){
 	var strData = JSON.stringify(data);
 	for (var i = 0; i < this.clients.length; ++i){

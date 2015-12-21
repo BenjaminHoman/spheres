@@ -118,10 +118,13 @@ var CommunicationClient = function(){
 	this.ws.onmessage = function(event){
 		var data = JSON.parse(event.data);
 		switch (data.type){
-			case 'stateDiff':
-				state.mergeDiffState(data);
+			case 'diff':
+				state.handleDiff(data);
 				break;
 		}
+	}
+	this.ws.onclose = function(event){
+		console.log("connection closed");
 	}
 }
 CommunicationClient.prototype.getUrl = function(){
