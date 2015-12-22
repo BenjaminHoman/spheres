@@ -30,7 +30,7 @@ GraphicsContext.prototype.init = function(){
 
 	this.scene.add(this.camera);
 
-	this.camera.position.z = 300;
+	this.camera.position.z = 600;
 
 	this.renderer.setSize(this.VIEWPORT.width, this.VIEWPORT.height);
 	this.renderer.setClearColor(0xffffff, 1);

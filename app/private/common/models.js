@@ -51,6 +51,7 @@ var Sphere = function(pos, radius){
 	this.radius = radius;
 	this.id = uuid.v1();
 	this.updatedPosition = false;
+	this.color = 0xCC00CC;
 }
 Sphere.prototype.intersects = function(sphere){
 	return (this.pos.distance(sphere.pos) <= this.radius + sphere.radius);

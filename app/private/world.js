@@ -5,23 +5,17 @@ var Utils = require("./common/utils.js");
 	Segment
 		contains spheres
 */
-var Segment = function(pos, size){
+var Segment = function(){
 	this.spheres = [];
-	this.size = size;
-	this.pos = pos;
 }
 Segment.prototype.intersects = function(sphere){
 	var intersectingSpheres = [];
-
 	for (var i = 0; i < this.spheres.length; ++i){
 		if (sphere.id != this.spheres[i].id && this.spheres[i].intersects(sphere)){
 			intersectingSpheres.push(this.spheres[i]);
 		}
 	}
 	return intersectingSpheres;
-}
-Segment.prototype.containsPosition = function(pos){
-	return (pos.x >= this.pos.x && pos.x < this.pos.x+this.size.x && pos.y >= this.pos.y && pos.y < this.pos.y+this.size.y && pos.z >= this.pos.z && pos.z < this.pos.z+this.size.z);
 }
 Segment.prototype.debug = function(){
 	console.log("pos: ", JSON.stringify(this.pos) + " size " + JSON.stringify(this.size) + " " + JSON.stringify(this.spheres));
@@ -39,7 +33,7 @@ var World = function(){
 
 	this.segmentSize = new Models.Vec3(10,10,10);
 	this.segmentAmnt = Utils.convertToUnitSpace(this.size, this.segmentSize);
-	this.segments = [];
+	this.segments = {};
 	this.spheres = [];
 
 	this.init();
@@ -50,35 +44,35 @@ var World = function(){
 	}, 300);
 }
 World.prototype.update = function(){
-	this.beginUpdate();
-
-	this.spheres[0].pos.x += 3;
-	this.spheres[0].pos.y += 2;
+	this.spheres[0].pos.x += 1;
+	this.spheres[0].pos.y += 0.5;
 	this.spheres[0].updatedPosition = true;
 
-	this.spheres[2].pos.x += 5;
+	this.spheres[2].pos.x += 1;
 	this.spheres[2].updatedPosition = true;
+
+	this.assigneSpheresToSegments();
+
+	for (var i = 0; i < this.spheres.length; ++i){
+		if (this.intersects(this.spheres[i]).length > 0){
+			this.spheres[i].color = 0x00ff00;
+		} else {
+			this.spheres[i].color = 0xCCF0CC;
+		}
+	}
 
 	var stateDiff = new Models.StateDiff();
 	stateDiff.spheres.push(this.spheres[0]);
+	stateDiff.spheres.push(this.spheres[1]);
 	stateDiff.spheres.push(this.spheres[2]);
 
 	this.broadcast(stateDiff);
 	this.endUpdate();
 }
 World.prototype.init = function(){
-	for (var z = this.pos.z; z < this.pos.z + this.size.z; z += this.segmentSize.z){
-		for (var y = this.pos.y; y < this.pos.y + this.size.y; y += this.segmentSize.y){
-			for (var x = this.pos.x; x < this.pos.x + this.size.x; x += this.segmentSize.x){
-				var segment = new Segment(new Models.Vec3(x,y,z), this.segmentSize);
-				this.segments.push(segment);
-			}
-		}
-	}
-
 	this.spheres.push(new Models.Sphere(new Models.Vec3(3,3,3), 5));
 	this.spheres.push(new Models.Sphere(new Models.Vec3(10,6,3), 2));
-	this.spheres.push(new Models.Sphere(new Models.Vec3(20,3,3), 7));
+	this.spheres.push(new Models.Sphere(new Models.Vec3(3,10,3), 7));
 }
 World.prototype.handleClientConnect = function(ws){
 	ws.client = new Models.Client();
@@ -115,33 +109,19 @@ World.prototype.getSegmentIndex = function(sphere){
 */
 World.prototype.assignToSegment = function(sphere){
 	var segmentIndex = this.getSegmentIndex(sphere);
+	var segment = this.segments[segmentIndex];
+	if (!segment){
+		this.segments[segmentIndex] = new Segment();
+	}
 	this.segments[segmentIndex].spheres.push(sphere);
 }
-/*
-	unassign to segment based on the calculated index and sphere id
-*/
-World.prototype.unassignFromSegment = function(sphere){
-	var segmentIndex = this.getSegmentIndex(sphere);
-	var segment = this.segments[segmentIndex];
-	if (segment){
-		for (var i = 0; i < segment.spheres.length; ++i){
-			if (segment.spheres[i].id == sphere.id){
-				segment.spheres.splice(i, 1);
-				return;
-			}
-		}
-	}
-}
 World.prototype.assigneSpheresToSegments = function(){
+	this.segments = {};
 	for (var i = 0; i < this.spheres.length; ++i){
 		if (this.spheres[i].updatedPosition){
-			this.unassignFromSegment(this.spheres[i]);
 			this.assignToSegment(this.spheres[i]);
 		}
 	}
-}
-World.prototype.beginUpdate = function(){
-	this.assigneSpheresToSegments();
 }
 World.prototype.endUpdate = function(){
 	for (var i = 0; i < this.spheres.length; ++i){
@@ -149,16 +129,14 @@ World.prototype.endUpdate = function(){
 	}
 }
 /*
-	find all spheres that intersect with arg
+	find all spheres that intersect with sphere
 */
 World.prototype.intersects = function(sphere){
 	var spheres = [];
-
 	var unitPos = Utils.convertToUnitSpace(sphere.pos, this.segmentSize);
 	for (var i = 0; i < Utils.adjacentDirections.length; ++i){
 		var adjacentPos = unitPos.add(Utils.adjacentDirections[i]);
 		var segment = this.segments[Utils.getIndex(adjacentPos, this.segmentAmnt)];
-
 		if (segment){
 			var intersectingSpheres = segment.intersects(sphere);
 			spheres = spheres.concat(intersectingSpheres);
@@ -169,7 +147,12 @@ World.prototype.intersects = function(sphere){
 World.prototype.broadcast = function(data){
 	var strData = JSON.stringify(data);
 	for (var i = 0; i < this.clients.length; ++i){
-		this.clients[i].send(strData);
+		try {
+			this.clients[i].send(strData);
+
+		} catch (err){
+			console.log("Error sending data");
+		}
 	}
 }
 World.prototype.debug = function(){

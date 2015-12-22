@@ -32,10 +32,12 @@ State.prototype.mergeDiffState = function(diffState){
 				clientSphere.sphereMesh.targetPosition = clientSphere.sphere.pos;
 				this.spheresToAnimatePosition[clientSphere.sphere.id] = clientSphere;
 			}
+			clientSphere.sphereMesh.material.color.setHex(diffState.spheres[i].color);
 
 		} else { //sphere does not exist so create and add it
 			var sphereMesh = graphicsContext.createSphere(diffState.spheres[i]);
 			var clientSphere = new ClientSphere(diffState.spheres[i], sphereMesh);
+			clientSphere.sphereMesh.material.color.setHex(diffState.spheres[i].color);
 			this.put(clientSphere);
 		}
 	}
