@@ -2,7 +2,7 @@ var uuid = require("node-uuid");
 
 /*
 	Client
-		represents a remote client
+		represents a client...
 */
 var Client = function(){
 	this.id = uuid.v1();
@@ -17,35 +17,16 @@ exports.Client = Client;
 		holds information about the differences of each sphere in the scene
 */
 var StateDiff = function(){
-	this.type = 'diff';
+	this.type = 'stateDiff';
 	this.spheres = [];
 }
 exports.StateDiff = StateDiff;
 
-/*
-	Diff
-		represents a diff component. could be an addition/removal/statechange...
-*/
-var Diff = function(){
-	this.type = "";
-}
-Diff.prototype.asRemove = function(){
-	this.type = "remove";
-	return this;
-}
-Diff.prototype.asAdd = function(){
-	this.type = "add";
-	return this;
-}
-Diff.prototype.asChange = function(){
-	this.type = "change";
-	return this;
-}
-exports.Diff = Diff;
 
 /*
-	Vec3
+	Spacial Models
 */
+
 var Vec3 = function(x, y, z){
 	this.x = x;
 	this.y = y;
@@ -65,13 +46,11 @@ Vec3.prototype.debug = function(){
 }
 exports.Vec3 = Vec3;
 
-/*
-	Sphere
-*/
 var Sphere = function(pos, radius){
 	this.pos = pos;
 	this.radius = radius;
 	this.id = uuid.v1();
+	this.updatedPosition = false;
 }
 Sphere.prototype.intersects = function(sphere){
 	return (this.pos.distance(sphere.pos) <= this.radius + sphere.radius);
