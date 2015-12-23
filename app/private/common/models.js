@@ -12,6 +12,7 @@ Client.prototype.debug = function(){
 }
 exports.Client = Client;
 
+
 /*
 	StateDiff
 		holds information about the differences of each sphere in the scene
@@ -46,6 +47,7 @@ Vec3.prototype.debug = function(){
 }
 exports.Vec3 = Vec3;
 
+
 var Sphere = function(pos, radius){
 	this.pos = pos;
 	this.radius = radius;
@@ -60,3 +62,25 @@ Sphere.prototype.debug = function(){
 	console.log(JSON.stringify(this));
 }
 exports.Sphere = Sphere;
+
+
+/*
+	Segment
+		contains spheres within a localized area for efficient collision detection
+*/
+var Segment = function(){
+	this.spheres = [];
+}
+Segment.prototype.intersects = function(sphere){
+	var intersectingSpheres = [];
+	for (var i = 0; i < this.spheres.length; ++i){
+		if (sphere.id != this.spheres[i].id && this.spheres[i].intersects(sphere)){
+			intersectingSpheres.push(this.spheres[i]);
+		}
+	}
+	return intersectingSpheres;
+}
+Segment.prototype.debug = function(){
+	console.log("pos: ", JSON.stringify(this.pos) + " size " + JSON.stringify(this.size) + " " + JSON.stringify(this.spheres));
+}
+exports.Segment = Segment;
