@@ -24,6 +24,10 @@ var World = function(){
 		that.update();
 
 	}, 300);
+
+	setInterval(function(){
+		that.spheres[3].inputPackets.push(new Models.Packet(null, 2));
+	}, 3500);
 }
 /*
 	executes every frame
@@ -40,28 +44,49 @@ World.prototype.update = function(){
 	this.collisionGrid.assign(this.spheres);
 
 	for (var i = 0; i < this.spheres.length; ++i){
-		if (this.collisionGrid.getIntersections(this.spheres[i]).length > 0){
-			if (0x00ff00 != this.spheres[i].color){
-				this.spheres[i].color = 0x00ff00;
-				diffHandler.updateSphere(this.spheres[i]);
-			}
-
-		} else if (0xCCF0CC != this.spheres[i].color){
-			this.spheres[i].color = 0xCCF0CC;
+		var sphere = this.spheres[i];
+		var sphereIntersections = this.collisionGrid.getIntersections(sphere);
+		sphere.process(sphereIntersections);
+	}
+	for (var i = 0; i < this.spheres.length; ++i){
+		var color = this.spheres[i].color;
+		this.spheres[i].calculateColor();
+		if (color != this.spheres[i].color){
 			diffHandler.updateSphere(this.spheres[i]);
 		}
+
+		this.spheres[i].postProcess();
 	}
 
 	this.broadcast(diffHandler.stateDiff);
 }
 World.prototype.init = function(){
-	this.spheres.push(new Models.Sphere(new Models.Vec3(3,3,3), 5));
-	this.spheres.push(new Models.Sphere(new Models.Vec3(10,6,3), 2));
-	this.spheres.push(new Models.Sphere(new Models.Vec3(3,10,3), 7));
+	this.spheres.push(new Models.Sphere(new Models.Vec3(3,30,3), 5));
+	this.spheres.push(new Models.Sphere(new Models.Vec3(10,63,3), 2));
+	this.spheres.push(new Models.Sphere(new Models.Vec3(3,40,3), 7));
 	
-	for (var i = 0; i < 30; ++i){
-		this.spheres.push(new Models.Sphere(new Models.Vec3(Utils.random(10,100), Utils.random(10,100), Utils.random(10,100)), Utils.random(3,10)));
-	}
+	//for (var i = 0; i < 30; ++i){
+		//this.spheres.push(new Models.Sphere(new Models.Vec3(Utils.random(10,100), Utils.random(10,100), Utils.random(10,100)), Utils.random(3,10)));
+	//}
+	this.spheres.push(new Models.Sphere(new Models.Vec3(14,12,2), 4));
+	this.spheres.push(new Models.Sphere(new Models.Vec3(22,12,2), 4));
+	this.spheres.push(new Models.Sphere(new Models.Vec3(30,12,2), 4));
+	this.spheres.push(new Models.Sphere(new Models.Vec3(38,12,2), 4));
+	this.spheres.push(new Models.Sphere(new Models.Vec3(46,12,2), 4));
+	this.spheres.push(new Models.Sphere(new Models.Vec3(54,12,2), 4));
+	this.spheres.push(new Models.Sphere(new Models.Vec3(62,12,2), 4));
+
+	this.spheres.push(new Models.Sphere(new Models.Vec3(46,12,10), 4));
+	this.spheres.push(new Models.Sphere(new Models.Vec3(46,12,18), 4));
+	this.spheres.push(new Models.Sphere(new Models.Vec3(46,12,26), 4));
+	this.spheres.push(new Models.Sphere(new Models.Vec3(46,12,34), 4));
+
+	this.spheres.push(new Models.Sphere(new Models.Vec3(62,12,10), 4));
+	this.spheres.push(new Models.Sphere(new Models.Vec3(62,12,18), 4));
+	this.spheres.push(new Models.Sphere(new Models.Vec3(62,12,26), 4));
+	this.spheres.push(new Models.Sphere(new Models.Vec3(62,12,34), 4));
+
+	//this.spheres.push(new Models.Sphere(new Models.Vec3(54,12,34), 4));
 }
 World.prototype.handleClientConnect = function(ws){
 	ws.client = new Models.Client();

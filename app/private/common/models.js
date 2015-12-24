@@ -1,4 +1,5 @@
 var uuid = require("node-uuid");
+var Utils = require('./utils.js');
 
 /*
 	Client
@@ -77,14 +78,54 @@ var Sphere = function(pos, radius){
 	this.id = uuid.v1();
 	this.updatedPosition = false;
 	this.color = 0xCC00CC;
+
+	this.inputPackets = [];
+	this.outputPackets = [];
 }
 Sphere.prototype.intersects = function(sphere){
 	return (this.pos.distance(sphere.pos) <= this.radius + sphere.radius);
+}
+/*
+	push output packets to intersecting spheres
+*/
+Sphere.prototype.process = function(intersectingSpheres){
+	for (var i = 0; i < this.outputPackets.length; ++i){
+		var outPacket = this.outputPackets[i];
+
+		for (var j = 0; j < intersectingSpheres.length; ++j){
+			var intersectingSphere = intersectingSpheres[j];
+
+			if (intersectingSphere.id != outPacket.prevSphere){
+				intersectingSphere.inputPackets.push(new Packet(this.id, outPacket.energy));
+			}
+		}
+	}
+}
+Sphere.prototype.postProcess = function(){
+	this.outputPackets = this.inputPackets;
+	this.inputPackets = [];
+}
+Sphere.prototype.calculateColor = function(){
+	var intensity = 0;
+	for (var i = 0; i < this.inputPackets.length; ++i){
+		intensity += 60;
+	}
+	this.color = Utils.rgbToInt(34+intensity, 120+intensity, 100+intensity);
 }
 Sphere.prototype.debug = function(){
 	console.log(JSON.stringify(this));
 }
 exports.Sphere = Sphere;
+
+
+/*
+	contains the packet to be passed from sphere to sphere
+*/
+var Packet = function(prevSphere, energy){
+	this.energy = energy;
+	this.prevSphere = prevSphere;
+}
+exports.Packet = Packet;
 
 
 /*

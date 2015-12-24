@@ -21,9 +21,12 @@ State.prototype.mergeDiffState = function(diffState){
 		switch (unitDiff.type){
 			case 'update':
 				if (this.sphereMap[id]){
-					this.sphereMap[id].updateData.position = unitDiff.data.pos;
 					this.sphereMap[id].sphereMesh.material.color.setHex(unitDiff.data.color);
-					this.spheresToUpdate[id] = this.sphereMap[id];
+
+					if (!isEqualVec(this.sphereMap[id].sphereMesh.position, unitDiff.data.pos)){
+						this.sphereMap[id].updateData.position = unitDiff.data.pos;
+						this.spheresToUpdate[id] = this.sphereMap[id];
+					}
 				}
 				break;
 			case 'add':

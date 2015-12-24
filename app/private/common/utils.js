@@ -1,9 +1,28 @@
 var Models = require("./Models.js");
 
+/*
+	convert rgb components to hex for transmission
+*/
+var rgbToInt = function(r, g, b){
+	var rgb = r;
+	rgb = (rgb << 8) + g;
+	rgb = (rgb << 8) + b;
+	return rgb;
+}
+exports.rgbToInt = rgbToInt;
+
+/*
+	get random number from (low) to (high)
+*/
 var random = function(low, high){
 	return Math.random() * (high - low) + low;
 }
 exports.random = random;
+
+var randomInt = function(low, high) {
+    return Math.floor(Math.random() * (high - low) + low);
+}
+exports.randomInt = randomInt;
 
 var convertToUnitSpace = function(pos, unit){
 	return new Models.Vec3(Math.floor(pos.x / unit.x), Math.floor(pos.y / unit.y), Math.floor(pos.z / unit.z));
