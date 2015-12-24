@@ -129,3 +129,25 @@ CommunicationClient.prototype.getUrl = function(){
 	console.log("using server url: " + url);
 	return url;
 }
+
+var distance = function(v1, v2){
+	return Math.sqrt(Math.pow(v1.x-v2.x,2) + Math.pow(v1.y-v2.y,2) + Math.pow(v1.z-v2.z,2));
+}
+
+/*
+	move to target
+*/
+var epsilon = 0.1;
+var moveToTarget = function(vec, target, delta){
+	var dist = distance(vec, target);
+	if (dist > epsilon){
+		return {
+			x: vec.x + ((target.x-vec.x) * 0.005 * delta),
+			y: vec.y + ((target.y-vec.y) * 0.005 * delta),
+			z: vec.z + ((target.z-vec.z) * 0.005 * delta),
+		};
+
+	} else {
+		return null;
+	}
+}

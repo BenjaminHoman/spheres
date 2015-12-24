@@ -1,5 +1,10 @@
 var Models = require("./Models.js");
 
+var random = function(low, high){
+	return Math.random() * (high - low) + low;
+}
+exports.random = random;
+
 var convertToUnitSpace = function(pos, unit){
 	return new Models.Vec3(Math.floor(pos.x / unit.x), Math.floor(pos.y / unit.y), Math.floor(pos.z / unit.z));
 }
@@ -60,6 +65,36 @@ CollisionGrid.prototype.getIntersections = function(sphere){
 exports.CollisionGrid = CollisionGrid;
 
 
+/*
+	handles actions on spheres
+*/
+var DiffHandler = function(){
+	this.stateDiff = new Models.StateDiff();
+}
+DiffHandler.prototype.createSphere = function(sphere){
+	var unitDiff = new Models.UnitDiff().asAdd();
+	unitDiff.data = {
+		pos: sphere.pos,
+		radius: sphere.radius,
+		color: sphere.color,
+	};
+	this.stateDiff.unitDiffs[sphere.id] = unitDiff;
+}
+DiffHandler.prototype.updateSphere = function(sphere){
+	var unitDiff = new Models.UnitDiff().asUpdate();
+	unitDiff.data = {
+		pos: sphere.pos,
+		color: sphere.color,
+	};
+
+	this.stateDiff.unitDiffs[sphere.id] = unitDiff;
+}
+DiffHandler.prototype.removeSphere = function(sphere){
+	var unitDiff = new Models.UnitDiff().asRemove();
+	this.stateDiff.unitDiffs[sphere.id] = unitDiff;
+}
+exports.DiffHandler = DiffHandler;
+
 
 
 
@@ -77,5 +112,28 @@ var adjacentDirections = [
 
 	new Models.Vec3(0,0,-1),
 	new Models.Vec3(0,0,1),
+
+	new Models.Vec3(-1,-1,-1),
+	new Models.Vec3(-1,-1,0),
+	new Models.Vec3(-1,-1,1),
+	new Models.Vec3(-1,0,1),
+	new Models.Vec3(-1,1,1),
+	new Models.Vec3(-1,1,0),
+	new Models.Vec3(-1,1,-1),
+	new Models.Vec3(-1,0,-1),
+
+	new Models.Vec3(1,-1,-1),
+	new Models.Vec3(1,-1,0),
+	new Models.Vec3(1,-1,1),
+	new Models.Vec3(1,0,1),
+	new Models.Vec3(1,1,1),
+	new Models.Vec3(1,1,0),
+	new Models.Vec3(1,1,-1),
+	new Models.Vec3(1,0,-1),
+
+	new Models.Vec3(0,-1,-1),
+	new Models.Vec3(0,-1,1),
+	new Models.Vec3(0,1,-1),
+	new Models.Vec3(0,1,1),
 ];
 exports.adjacentDirections = adjacentDirections;

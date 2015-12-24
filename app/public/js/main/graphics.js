@@ -30,7 +30,7 @@ GraphicsContext.prototype.init = function(){
 
 	this.scene.add(this.camera);
 
-	this.camera.position.z = 600;
+	this.camera.position.z = 300;
 
 	this.renderer.setSize(this.VIEWPORT.width, this.VIEWPORT.height);
 	this.renderer.setClearColor(0xffffff, 1);
@@ -41,16 +41,15 @@ GraphicsContext.prototype.init = function(){
 }
 GraphicsContext.prototype.createSphere = function(sphere){
 	var radius = sphere.radius;
-	var segments = 10;
-	var rings = 10;
+	var segments = 9;
+	var rings = 9;
 	var sphereMaterial = new THREE.MeshLambertMaterial({
-		color: 0xCC00CC,
+		color: sphere.color,
 	});
 	var sphereMesh = new THREE.Mesh(new THREE.SphereGeometry(radius,segments,rings), sphereMaterial);
 	sphereMesh.position.x = sphere.pos.x;
 	sphereMesh.position.y = sphere.pos.y;
 	sphereMesh.position.z = sphere.pos.z;
-	sphereMesh.name = sphere.id;
 	this.scene.add(sphereMesh);
 	return sphereMesh;
 }

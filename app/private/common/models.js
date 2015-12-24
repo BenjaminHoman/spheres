@@ -19,9 +19,32 @@ exports.Client = Client;
 */
 var StateDiff = function(){
 	this.type = 'stateDiff';
-	this.spheres = [];
+	this.unitDiffs = {};
 }
 exports.StateDiff = StateDiff;
+
+
+/*
+	UnitDiff
+		holds info about what to do with individual spheres
+*/
+var UnitDiff = function(){
+	this.type = "";
+	this.data = {};
+}
+UnitDiff.prototype.asUpdate = function(){
+	this.type = "update";
+	return this;
+}
+UnitDiff.prototype.asRemove = function(){
+	this.type = 'remove';
+	return this;
+}
+UnitDiff.prototype.asAdd = function(){
+	this.type = 'add';
+	return this;
+}
+exports.UnitDiff = UnitDiff;
 
 
 /*
