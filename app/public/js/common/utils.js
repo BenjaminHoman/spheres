@@ -163,3 +163,61 @@ var moveToTarget = function(vec, target, delta, scale, epsilon){
 		return null;
 	}
 }
+
+/*
+
+*/
+var cameraFollowAtDistance = function(vec, target, delta, dist, epsilon){
+	var actualDist = distance(vec, target);
+	if (actualDist < dist){
+		return null;
+	}
+	var directionToTarget = {
+		x: vec.x - target.x,
+		y: vec.y - target.y,
+		z: vec.z - target.z,
+	};
+	var directionMagnitude = distance(directionToTarget, {x: 0, y: 0, z: 0});
+	directionToTarget.x = (directionToTarget.x / directionMagnitude) * dist;
+	directionToTarget.y = (directionToTarget.y / directionMagnitude) * dist;
+	directionToTarget.z = (directionToTarget.z / directionMagnitude) * dist;
+	var actualTarget = {
+		x: target.x - directionToTarget.x,
+		y: target.y - directionToTarget.y,
+		z: target.z - directionToTarget.z,
+	};
+
+	return moveToTarget(vec, actualTarget, delta, 0.0005, epsilon);
+
+	// if (distance(vec, actualTarget) > epsilon){
+	// 	var newX = vec.x;
+	// 	var newY = vec.y;
+	// 	var newZ = vec.z;
+	// 	if (directionToTarget.x < 0){
+	// 		newX += 0.01 * delta;
+
+	// 	} else if (directionToTarget.x > 0){
+	// 		newX -= 0.01 * delta;
+	// 	}
+	// 	if (directionToTarget.y < 0){
+	// 		newY += 0.01 * delta;
+
+	// 	} else if (directionToTarget.y > 0){
+	// 		newY -= 0.01 * delta;
+	// 	}
+	// 	if (directionToTarget.z < 0){
+	// 		newZ += 0.01 * delta;
+
+	// 	} else if (directionToTarget.z > 0){
+	// 		newZ -= 0.01 * delta;
+	// 	}
+	// 	return {
+	// 		x: newX,
+	// 		y: newY,
+	// 		z: newZ,
+	// 	}
+
+	// } else {
+	// 	return null;
+	// }
+}

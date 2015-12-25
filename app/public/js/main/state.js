@@ -11,6 +11,12 @@ var ClientSphere = function(sphereMesh){
 }
 
 var State = function(){
+	this.cameraTargetLocation = {
+		x: 0,
+		y: 0,
+		z: 0,
+	};
+
 	this.sphereMap = {};
 	this.spheresToUpdatePosition = {};
 	this.spheresToUpdateColor = {};
@@ -49,6 +55,9 @@ State.prototype.mergeDiffState = function(diffState){
 				break;
 		}
 	}
+	if (diffState.clientPosition){
+		this.cameraTargetLocation = diffState.clientPosition;
+	}
 }
 State.prototype.put = function(sphere){
 	this.sphereMap[sphere.sphere.id] = sphere;
@@ -77,6 +86,15 @@ State.prototype.animate = function(delta){
 			this.animateColorChange(id, clientSphere, delta);
 		}
 	}
+
+	//move camera to target position
+	var newPos = cameraFollowAtDistance(graphicsContext.camera.position, this.cameraTargetLocation, delta, 150, 0.1);
+	if (newPos){
+		graphicsContext.camera.position.x = newPos.x;
+		graphicsContext.camera.position.y = newPos.y;
+		graphicsContext.camera.position.z = newPos.z;
+	}
+	graphicsContext.camera.lookAt(new THREE.Vector3(this.cameraTargetLocation.x, this.cameraTargetLocation.y, this.cameraTargetLocation.z));
 }
 State.prototype.animateMovement = function(id, clientSphere, delta){
 	var epsilon = 0.1;

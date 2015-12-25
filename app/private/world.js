@@ -24,16 +24,6 @@ var World = function(){
 		that.update();
 
 	}, 300);
-
-	setTimeout(function(){
-		that.spheres[7].inputPackets.push(new Models.Packet({
-			prevSphere: null,
-			energy: 2,
-			hasClient: true,
-			pos: that.spheres[7].pos,
-		}));
-
-	}, 10000);
 }
 /*
 	executes every frame
@@ -104,12 +94,24 @@ World.prototype.init = function(){
   
   	this.spheres.push(new Models.Sphere(new Models.Vec3(54,12,34), 4));
 
-  	for (var i = 0; i < 130; ++i){
+  	for (var i = 0; i < 30; ++i){
 		this.spheres.push(new Models.Sphere(new Models.Vec3(Utils.random(100,400), Utils.random(100,400), Utils.random(100,400)), Utils.random(3,8)));
 	}
+
+	var worldGenerator = new Utils.WorldGenerator(this, 100, new Models.Vec3(400,400,400));
+	worldGenerator.generate();
 }
 World.prototype.handleClientConnect = function(ws){
-	ws.client = new Models.Client();
+	var initSphere = Utils.randomInt(0, this.spheres.length-1);
+	var clientPacket = new Models.Packet({
+		prevSphere: null,
+		energy: 2,
+		hasClient: true,
+		pos: this.spheres[initSphere].pos,
+	});
+	this.spheres[initSphere].inputPackets.push(clientPacket);
+
+	ws.client = new Models.Client(clientPacket);
 	console.log("Client connected: " + ws.client.id);
 
 	this.clients.push(ws);
@@ -125,6 +127,7 @@ World.prototype.handleClientMessage = function(ws, msg){
 	console.log("client message: " + msg);
 }
 World.prototype.handleClientDisconnect = function(ws){
+	ws.client.packet.hasClient = false;
 	console.log("Client disconnected: " + ws.client.id);
 	this.removeClientWithWs(ws);
 }
@@ -138,10 +141,10 @@ World.prototype.removeClientWithWs = function(ws){
 	console.error("trying to remove client that is not connected");
 }
 World.prototype.broadcastStateDiff = function(unitDiff){
-	var strData = JSON.stringify(unitDiff);
 	for (var i = 0; i < this.clients.length; ++i){
 		try {
-			this.clients[i].send(strData);
+			unitDiff.clientPosition = this.clients[i].client.packet.pos;
+			this.clients[i].send(JSON.stringify(unitDiff));
 
 		} catch (err){
 			console.error("Error sending data");

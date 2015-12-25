@@ -124,6 +124,49 @@ DiffHandler.prototype.createUpdateIfNeeded = function(sphere){
 exports.DiffHandler = DiffHandler;
 
 
+/*
+	World generator
+*/
+var WorldGenerator = function(world, sphereAmnt, size){
+	this.sphereAmnt = sphereAmnt;
+	this.world = world;
+	this.size = size;
+}
+WorldGenerator.prototype.generate = function(){
+	var currentX = 0;
+	var currentY = 0;
+	var currentZ = 0;
+	var lastRadius = 0;
+
+	for (var i = 0; i < this.sphereAmnt; ++i){
+		if (i == 0){
+			currentX = random(0, this.size.x-1);
+			currentY = random(0, this.size.y-1);
+			currentZ = random(0, this.size.z-1);
+			lastRadius = random(3,8);
+			this.add(currentX, currentY, currentZ, lastRadius);
+
+		} else {
+			var nextPosition = this.getNextPosition(currentX, currentY, currentZ, lastRadius);
+			currentX = nextPosition.x;
+			currentY = nextPosition.y;
+			currentZ = nextPosition.z;
+			lastRadius = random(3,8);
+			this.add(currentX, currentY, currentZ, lastRadius);
+		}
+	}
+}
+WorldGenerator.prototype.add = function(x, y, z, radius){
+	this.world.spheres.push(new Models.Sphere(new Models.Vec3(x,y,z), radius));
+}
+WorldGenerator.prototype.getNextPosition = function(lastX, lastY, lastZ, lastRadius){
+	var dirX = random(-lastRadius-4, lastRadius+4);
+	var dirY = random(-lastRadius-4, lastRadius+4);
+	var dirZ = random(-lastRadius-4, lastRadius+4);
+
+	return new Models.Vec3(lastX, lastY, lastZ).add(new Models.Vec3(dirX, dirY, dirY));
+}
+exports.WorldGenerator = WorldGenerator;
 
 
 /*

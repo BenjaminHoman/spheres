@@ -5,9 +5,9 @@ var Utils = require('./utils.js');
 	Client
 		represents a client...
 */
-var Client = function(){
+var Client = function(packet){
 	this.id = uuid.v1();
-	this.position = new Vec3(0,0,0);
+	this.packet = packet;
 }
 Client.prototype.debug = function(){
 	console.log(this.constructor.name + " with id: " + this.id);
@@ -19,10 +19,9 @@ exports.Client = Client;
 	StateDiff
 		holds information about the differences of each sphere in the scene
 */
-var StateDiff = function(packet){
+var StateDiff = function(){
 	this.type = 'stateDiff';
 	this.unitDiffs = {};
-	//this.packet = packet;
 }
 exports.StateDiff = StateDiff;
 
@@ -107,14 +106,9 @@ Sphere.prototype.process = function(intersectingSpheres){
 
 		if (possibleOutSpheres.length > 0 && Math.random() < passProbability){
 			var passIndex = Utils.randomInt(0, possibleOutSpheres.length-1);
-
-			var passedPacket = new Packet({
-				prevSphere: this.id,
-				energy: outPacket.energy,
-				hasClient: outPacket.hasClient,
-				pos: possibleOutSpheres[passIndex].pos,
-			});
-			possibleOutSpheres[passIndex].inputPackets.push(passedPacket);
+			outPacket.prevSphere = this.id;
+			outPacket.pos = possibleOutSpheres[passIndex].pos
+			possibleOutSpheres[passIndex].inputPackets.push(outPacket);
 
 		} else if (outPacket.hasClient){
 			this.outputClientPackets.push(outPacket);
