@@ -24,10 +24,6 @@ var World = function(){
 		that.update();
 
 	}, 300);
-
-	setInterval(function(){
-		that.spheres[3].inputPackets.push(new Models.Packet(null, 2));
-	}, 3500);
 }
 /*
 	executes every frame
@@ -35,11 +31,13 @@ var World = function(){
 World.prototype.update = function(){
 	var diffHandler = new Utils.DiffHandler();
 
+	this.spheres[Utils.randomInt(0,this.spheres.length-1)].inputPackets.push(new Models.Packet(null, 2));
+
 	this.spheres[0].pos = this.spheres[0].pos.add(new Models.Vec3(2,1,0));
-	diffHandler.updateSphere(this.spheres[0]);
+	diffHandler.updateSpherePosition(this.spheres[0]);
 
 	this.spheres[2].pos = this.spheres[2].pos.add(new Models.Vec3(3,1.5,1));
-	diffHandler.updateSphere(this.spheres[2]);
+	diffHandler.updateSpherePosition(this.spheres[2]);
 
 	this.collisionGrid.assign(this.spheres);
 
@@ -52,7 +50,7 @@ World.prototype.update = function(){
 		var color = this.spheres[i].color;
 		this.spheres[i].calculateColor();
 		if (color != this.spheres[i].color){
-			diffHandler.updateSphere(this.spheres[i]);
+			diffHandler.updateSphereColor(this.spheres[i]);
 		}
 
 		this.spheres[i].postProcess();
@@ -65,26 +63,26 @@ World.prototype.init = function(){
 	this.spheres.push(new Models.Sphere(new Models.Vec3(10,63,3), 2));
 	this.spheres.push(new Models.Sphere(new Models.Vec3(3,40,3), 7));
 	
-	//for (var i = 0; i < 30; ++i){
-		//this.spheres.push(new Models.Sphere(new Models.Vec3(Utils.random(10,100), Utils.random(10,100), Utils.random(10,100)), Utils.random(3,10)));
-	//}
-	this.spheres.push(new Models.Sphere(new Models.Vec3(14,12,2), 4));
-	this.spheres.push(new Models.Sphere(new Models.Vec3(22,12,2), 4));
-	this.spheres.push(new Models.Sphere(new Models.Vec3(30,12,2), 4));
-	this.spheres.push(new Models.Sphere(new Models.Vec3(38,12,2), 4));
-	this.spheres.push(new Models.Sphere(new Models.Vec3(46,12,2), 4));
-	this.spheres.push(new Models.Sphere(new Models.Vec3(54,12,2), 4));
-	this.spheres.push(new Models.Sphere(new Models.Vec3(62,12,2), 4));
+	for (var i = 0; i < 130; ++i){
+		this.spheres.push(new Models.Sphere(new Models.Vec3(Utils.random(10,200), Utils.random(10,200), Utils.random(10,200)), Utils.random(3,10)));
+	}
+	//this.spheres.push(new Models.Sphere(new Models.Vec3(14,12,2), 4));
+	//this.spheres.push(new Models.Sphere(new Models.Vec3(22,12,2), 4));
+	//this.spheres.push(new Models.Sphere(new Models.Vec3(30,12,2), 4));
+	//this.spheres.push(new Models.Sphere(new Models.Vec3(38,12,2), 4));
+	//this.spheres.push(new Models.Sphere(new Models.Vec3(46,12,2), 4));
+	//this.spheres.push(new Models.Sphere(new Models.Vec3(54,12,2), 4));
+	//this.spheres.push(new Models.Sphere(new Models.Vec3(62,12,2), 4));
 
-	this.spheres.push(new Models.Sphere(new Models.Vec3(46,12,10), 4));
-	this.spheres.push(new Models.Sphere(new Models.Vec3(46,12,18), 4));
-	this.spheres.push(new Models.Sphere(new Models.Vec3(46,12,26), 4));
-	this.spheres.push(new Models.Sphere(new Models.Vec3(46,12,34), 4));
+	//this.spheres.push(new Models.Sphere(new Models.Vec3(46,12,10), 4));
+	//this.spheres.push(new Models.Sphere(new Models.Vec3(46,12,18), 4));
+	//this.spheres.push(new Models.Sphere(new Models.Vec3(46,12,26), 4));
+	//this.spheres.push(new Models.Sphere(new Models.Vec3(46,12,34), 4));
 
-	this.spheres.push(new Models.Sphere(new Models.Vec3(62,12,10), 4));
-	this.spheres.push(new Models.Sphere(new Models.Vec3(62,12,18), 4));
-	this.spheres.push(new Models.Sphere(new Models.Vec3(62,12,26), 4));
-	this.spheres.push(new Models.Sphere(new Models.Vec3(62,12,34), 4));
+	//this.spheres.push(new Models.Sphere(new Models.Vec3(62,12,10), 4));
+	//this.spheres.push(new Models.Sphere(new Models.Vec3(62,12,18), 4));
+	//this.spheres.push(new Models.Sphere(new Models.Vec3(62,12,26), 4));
+	//this.spheres.push(new Models.Sphere(new Models.Vec3(62,12,34), 4));
 
 	//this.spheres.push(new Models.Sphere(new Models.Vec3(54,12,34), 4));
 }

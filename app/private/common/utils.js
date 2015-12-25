@@ -99,18 +99,22 @@ DiffHandler.prototype.createSphere = function(sphere){
 	};
 	this.stateDiff.unitDiffs[sphere.id] = unitDiff;
 }
-DiffHandler.prototype.updateSphere = function(sphere){
-	var unitDiff = new Models.UnitDiff().asUpdate();
-	unitDiff.data = {
-		pos: sphere.pos,
-		color: sphere.color,
-	};
-
-	this.stateDiff.unitDiffs[sphere.id] = unitDiff;
+DiffHandler.prototype.updateSpherePosition = function(sphere){
+	this.createUpdateIfNeeded(sphere);
+	this.stateDiff.unitDiffs[sphere.id].data.pos = sphere.pos;
+}
+DiffHandler.prototype.updateSphereColor = function(sphere){
+	this.createUpdateIfNeeded(sphere);
+	this.stateDiff.unitDiffs[sphere.id].data.color = sphere.color;
 }
 DiffHandler.prototype.removeSphere = function(sphere){
 	var unitDiff = new Models.UnitDiff().asRemove();
 	this.stateDiff.unitDiffs[sphere.id] = unitDiff;
+}
+DiffHandler.prototype.createUpdateIfNeeded = function(sphere){
+	if (!this.stateDiff.unitDiffs[sphere.id]){
+		this.stateDiff.unitDiffs[sphere.id] = new Models.UnitDiff().asUpdate();
+	}
 }
 exports.DiffHandler = DiffHandler;
 

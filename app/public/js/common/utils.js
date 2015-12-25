@@ -130,6 +130,15 @@ CommunicationClient.prototype.getUrl = function(){
 	return url;
 }
 
+var unit = 1.0/255;
+var hexToRGB = function(hex){
+	return {
+		r: unit * ((hex >> 16) & 255),
+		g: unit * ((hex >> 8) & 255),
+		b: unit * (hex & 255),
+	};
+}
+
 var isEqualVec = function(v1, v2){
 	return (v1.x == v2.x && v1.y == v2.y && v1.z == v2.z);
 }
@@ -141,14 +150,13 @@ var distance = function(v1, v2){
 /*
 	move to target
 */
-var epsilon = 0.1;
-var moveToTarget = function(vec, target, delta){
+var moveToTarget = function(vec, target, delta, scale, epsilon){
 	var dist = distance(vec, target);
 	if (dist > epsilon){
 		return {
-			x: vec.x + ((target.x-vec.x) * 0.005 * delta),
-			y: vec.y + ((target.y-vec.y) * 0.005 * delta),
-			z: vec.z + ((target.z-vec.z) * 0.005 * delta),
+			x: vec.x + ((target.x-vec.x) * scale * delta),
+			y: vec.y + ((target.y-vec.y) * scale * delta),
+			z: vec.z + ((target.z-vec.z) * scale * delta),
 		};
 
 	} else {

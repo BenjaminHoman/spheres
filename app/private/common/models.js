@@ -88,6 +88,7 @@ Sphere.prototype.intersects = function(sphere){
 /*
 	push output packets to intersecting spheres
 */
+var passProbability = 0.85;
 Sphere.prototype.process = function(intersectingSpheres){
 	for (var i = 0; i < this.outputPackets.length; ++i){
 		var outPacket = this.outputPackets[i];
@@ -95,8 +96,9 @@ Sphere.prototype.process = function(intersectingSpheres){
 		for (var j = 0; j < intersectingSpheres.length; ++j){
 			var intersectingSphere = intersectingSpheres[j];
 
-			if (intersectingSphere.id != outPacket.prevSphere){
+			if (intersectingSphere.id != outPacket.prevSphere && Math.random() < passProbability){
 				intersectingSphere.inputPackets.push(new Packet(this.id, outPacket.energy));
+				break;
 			}
 		}
 	}
@@ -108,9 +110,9 @@ Sphere.prototype.postProcess = function(){
 Sphere.prototype.calculateColor = function(){
 	var intensity = 0;
 	for (var i = 0; i < this.inputPackets.length; ++i){
-		intensity += 60;
+		intensity += 100;
 	}
-	this.color = Utils.rgbToInt(34+intensity, 120+intensity, 100+intensity);
+	this.color = Utils.rgbToInt(34+intensity, 120+intensity, 100);
 }
 Sphere.prototype.debug = function(){
 	console.log(JSON.stringify(this));
