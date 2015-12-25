@@ -24,6 +24,11 @@ var randomInt = function(low, high) {
 }
 exports.randomInt = randomInt;
 
+var clamp = function(value, min, max) {
+  return Math.min(Math.max(value, min), max);
+}
+exports.clamp = clamp;
+
 var convertToUnitSpace = function(pos, unit){
 	return new Models.Vec3(Math.floor(pos.x / unit.x), Math.floor(pos.y / unit.y), Math.floor(pos.z / unit.z));
 }

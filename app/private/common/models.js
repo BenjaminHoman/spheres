@@ -21,6 +21,7 @@ exports.Client = Client;
 var StateDiff = function(){
 	this.type = 'stateDiff';
 	this.unitDiffs = {};
+	this.clientPos = null;
 }
 exports.StateDiff = StateDiff;
 
@@ -81,6 +82,7 @@ var Sphere = function(pos, radius){
 
 	this.inputPackets = [];
 	this.outputPackets = [];
+	this.outputClientPackets = [];
 }
 Sphere.prototype.intersects = function(sphere){
 	return (this.pos.distance(sphere.pos) <= this.radius + sphere.radius);
@@ -93,26 +95,34 @@ Sphere.prototype.process = function(intersectingSpheres){
 	for (var i = 0; i < this.outputPackets.length; ++i){
 		var outPacket = this.outputPackets[i];
 
+		var possibleOutSpheres = [];
 		for (var j = 0; j < intersectingSpheres.length; ++j){
 			var intersectingSphere = intersectingSpheres[j];
 
-			if (intersectingSphere.id != outPacket.prevSphere && Math.random() < passProbability){
-				intersectingSphere.inputPackets.push(new Packet(this.id, outPacket.energy));
-				break;
+			if (intersectingSphere.id != outPacket.prevSphere){
+				possibleOutSpheres.push(intersectingSphere);
 			}
+		}
+
+		if (possibleOutSpheres.length > 0 && Math.random() < passProbability){
+			possibleOutSpheres[Utils.randomInt(0, possibleOutSpheres.length-1)].inputPackets.push(new Packet(this.id, outPacket.energy, outPacket.client));
+
+		} else if (outPacket.client != null){
+			this.outputClientPackets.push(outPacket);
 		}
 	}
 }
 Sphere.prototype.postProcess = function(){
-	this.outputPackets = this.inputPackets;
+	this.outputPackets = this.inputPackets.concat(this.outputClientPackets);
+	this.outputClientPackets = [];
 	this.inputPackets = [];
 }
 Sphere.prototype.calculateColor = function(){
 	var intensity = 0;
-	for (var i = 0; i < this.inputPackets.length; ++i){
+	for (var i = 0; i < this.outputPackets.length; ++i){
 		intensity += 100;
 	}
-	this.color = Utils.rgbToInt(34+intensity, 120+intensity, 100);
+	this.color = Utils.rgbToInt(Utils.clamp(34+intensity, 0, 255), Utils.clamp(120+intensity, 0, 255), 100);
 }
 Sphere.prototype.debug = function(){
 	console.log(JSON.stringify(this));
@@ -123,9 +133,10 @@ exports.Sphere = Sphere;
 /*
 	contains the packet to be passed from sphere to sphere
 */
-var Packet = function(prevSphere, energy){
+var Packet = function(prevSphere, energy, client){
 	this.energy = energy;
 	this.prevSphere = prevSphere;
+	this.client = client;
 }
 exports.Packet = Packet;
 
