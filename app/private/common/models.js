@@ -7,6 +7,7 @@ var Utils = require('./utils.js');
 */
 var Client = function(){
 	this.id = uuid.v1();
+	this.position = new Vec3(0,0,0);
 }
 Client.prototype.debug = function(){
 	console.log(this.constructor.name + " with id: " + this.id);
@@ -18,10 +19,10 @@ exports.Client = Client;
 	StateDiff
 		holds information about the differences of each sphere in the scene
 */
-var StateDiff = function(){
+var StateDiff = function(packet){
 	this.type = 'stateDiff';
 	this.unitDiffs = {};
-	this.clientPos = null;
+	//this.packet = packet;
 }
 exports.StateDiff = StateDiff;
 
@@ -105,9 +106,17 @@ Sphere.prototype.process = function(intersectingSpheres){
 		}
 
 		if (possibleOutSpheres.length > 0 && Math.random() < passProbability){
-			possibleOutSpheres[Utils.randomInt(0, possibleOutSpheres.length-1)].inputPackets.push(new Packet(this.id, outPacket.energy, outPacket.client));
+			var passIndex = Utils.randomInt(0, possibleOutSpheres.length-1);
 
-		} else if (outPacket.client != null){
+			var passedPacket = new Packet({
+				prevSphere: this.id,
+				energy: outPacket.energy,
+				hasClient: outPacket.hasClient,
+				pos: possibleOutSpheres[passIndex].pos,
+			});
+			possibleOutSpheres[passIndex].inputPackets.push(passedPacket);
+
+		} else if (outPacket.hasClient){
 			this.outputClientPackets.push(outPacket);
 		}
 	}
@@ -133,10 +142,11 @@ exports.Sphere = Sphere;
 /*
 	contains the packet to be passed from sphere to sphere
 */
-var Packet = function(prevSphere, energy, client){
-	this.energy = energy;
-	this.prevSphere = prevSphere;
-	this.client = client;
+var Packet = function(model){
+	this.energy = model.energy;
+	this.prevSphere = model.prevSphere;
+	this.hasClient = model.hasClient;
+	this.pos = model.pos;
 }
 exports.Packet = Packet;
 

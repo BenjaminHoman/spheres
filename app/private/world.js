@@ -26,7 +26,12 @@ var World = function(){
 	}, 300);
 
 	setTimeout(function(){
-		that.spheres[7].inputPackets.push(new Models.Packet(null, 2, that.clients[0].client));
+		that.spheres[7].inputPackets.push(new Models.Packet({
+			prevSphere: null,
+			energy: 2,
+			hasClient: true,
+			pos: that.spheres[7].pos,
+		}));
 
 	}, 10000);
 }
@@ -36,7 +41,12 @@ var World = function(){
 World.prototype.update = function(){
 	var diffHandler = new Utils.DiffHandler();
 
-	this.spheres[Utils.randomInt(0,this.spheres.length-1)].inputPackets.push(new Models.Packet(null, 2, null));
+	this.spheres[Utils.randomInt(0,this.spheres.length-1)].inputPackets.push(new Models.Packet({
+		prevSphere: null,
+		energy: 2,
+		hasClient: false,
+		pos: null,
+	}));
 
 	//this.spheres[0].pos = this.spheres[0].pos.add(new Models.Vec3(2,1,0));
 	//diffHandler.updateSpherePosition(this.spheres[0]);
@@ -92,7 +102,7 @@ World.prototype.init = function(){
  	this.spheres.push(new Models.Sphere(new Models.Vec3(62,12,26), 4));
  	this.spheres.push(new Models.Sphere(new Models.Vec3(62,12,34), 4));
   
-  	//this.spheres.push(new Models.Sphere(new Models.Vec3(54,12,34), 4));
+  	this.spheres.push(new Models.Sphere(new Models.Vec3(54,12,34), 4));
 
   	for (var i = 0; i < 130; ++i){
 		this.spheres.push(new Models.Sphere(new Models.Vec3(Utils.random(100,400), Utils.random(100,400), Utils.random(100,400)), Utils.random(3,8)));
