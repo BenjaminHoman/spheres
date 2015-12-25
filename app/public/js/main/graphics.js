@@ -8,6 +8,8 @@ var GraphicsContext = function(){
 		near: 0.1,
 		far: 10000,
 	};
+	this.hideDistThreshhold = 80.0;
+
 	this.container = null;
 	this.renderer = null;
 	this.camera = null;
@@ -46,6 +48,7 @@ GraphicsContext.prototype.createSphere = function(sphere){
 	var sphereMaterial = new THREE.MeshLambertMaterial({
 		color: sphere.color,
 	});
+	sphereMaterial.transparent = true;
 	var sphereMesh = new THREE.Mesh(new THREE.SphereGeometry(radius,segments,rings), sphereMaterial);
 	sphereMesh.position.x = sphere.pos.x;
 	sphereMesh.position.y = sphere.pos.y;
@@ -65,5 +68,22 @@ GraphicsContext.prototype.resize = function(){
 	this.camera.updateProjectionMatrix();
 }
 GraphicsContext.prototype.render = function(){
+	this.hideNearObjects();
 	this.renderer.render(this.scene, this.camera);
+}
+GraphicsContext.prototype.hideNearObjects = function(){
+	var unit = 1.0 / this.hideDistThreshhold;
+	var that = this;
+	this.scene.traverse(function(node){
+		if (node instanceof THREE.Mesh){
+			var distanceToCamera = distance(node.position, that.camera.position);
+
+			if (distanceToCamera < that.hideDistThreshhold){
+				node.material.opacity = unit * (Math.pow(distanceToCamera, 2) * 0.02);
+			
+			} else {
+				node.material.opacity = 1.0;
+			}
+    	}
+	});
 }
