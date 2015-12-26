@@ -65,9 +65,9 @@ World.prototype.update = function(){
 
 	this.broadcastStateDiff(diffHandler.stateDiff);
 
-	//var now = Date.now();
-	//console.log(now - this.last);
-	//this.last = now;
+	now = Date.now();
+	console.log(now - this.last);
+	this.last = now;
 }
 World.prototype.init = function(){
 	this.spheres.push(new Models.Sphere(new Models.Vec3(3,30,3), 5));
@@ -97,9 +97,9 @@ World.prototype.init = function(){
   	for (var i = 0; i < 30; ++i){
 		this.spheres.push(new Models.Sphere(new Models.Vec3(Utils.random(100,400), Utils.random(100,400), Utils.random(100,400)), Utils.random(3,8)));
 	}
-
-	var worldGenerator = new Utils.WorldGenerator(this, 160, new Models.Vec3(400,400,400));
-	worldGenerator.generate();
+	for (var i = 0; i < 10; ++i){
+		new Utils.WorldGenerator(this, 40, new Models.Vec3(400,400,400)).generate();
+	}
 }
 World.prototype.handleClientConnect = function(ws){
 	var initSphere = Utils.randomInt(0, this.spheres.length-1);

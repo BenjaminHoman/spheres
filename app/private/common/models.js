@@ -61,11 +61,18 @@ var Vec3 = function(x, y, z){
 Vec3.prototype.add = function(vec){
 	return new Vec3(this.x+vec.x, this.y+vec.y, this.z+vec.z);
 }
+Vec3.prototype.mult = function(scalar){
+	return new Vec3(this.x*scalar, this.y*scalar, this.z*scalar);
+}
 Vec3.prototype.neg = function(){
 	return new Vec3(-this.x, -this.y, -this.z);
 }
 Vec3.prototype.distance = function(vec){
 	return Math.sqrt(Math.pow(vec.x-this.x,2) + Math.pow(vec.y-this.y,2) + Math.pow(vec.z-this.z,2));
+}
+Vec3.prototype.normalize = function(){
+	var mag = this.distance({x: 0, y: 0, z: 0});
+	return new Vec3(this.x/mag, this.y/mag, this.z/mag);
 }
 Vec3.prototype.debug = function(){
 	console.log(this.x, this.y, this.z);

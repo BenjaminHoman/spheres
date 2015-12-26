@@ -44,8 +44,6 @@ GraphicsContext.prototype.init = function(){
 	this.orbitControls.enableZoom = true;
 	this.orbitControls.minDistance = 120;
 	this.orbitControls.maxDistance = 200;
-
-	console.log("GraphicsContext init");
 }
 GraphicsContext.prototype.createSphere = function(sphere){
 	var radius = sphere.radius;

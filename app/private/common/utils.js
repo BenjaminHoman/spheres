@@ -49,6 +49,43 @@ var getSegmentIndex = function(sphere, segmentSize, segmentAmnt){
 }
 exports.getSegmentIndex = getSegmentIndex;
 
+var quaterionMultiply = function(vectorA, vectorB){
+	var out = {};
+    out.w = vectorA.w*vectorB.w - vectorA.x*vectorB.x - vectorA.y*vectorB.y - vectorA.z*vectorB.z;
+    out.x = vectorA.w*vectorB.x + vectorA.x*vectorB.w + vectorA.y*vectorB.z - vectorA.z*vectorB.y;
+    out.y = vectorA.w*vectorB.y - vectorA.x*vectorB.z + vectorA.y*vectorB.w + vectorA.z*vectorB.x;
+    out.z = vectorA.w*vectorB.z + vectorA.x*vectorB.y - vectorA.y*vectorB.x + vectorA.z*vectorB.w;
+    return out;
+}
+
+var rotateVec = function(vec, inputaxis, inputangle){
+    var vector = {
+    	x: vec.x,
+    	y: vec.y,
+    	z: vec.z,
+    	w: 0,
+    };
+
+    var axis = {
+    	x: inputaxis.x * Math.sin(inputangle/2),
+    	y: inputaxis.y * Math.sin(inputangle/2),
+    	z: inputaxis.z * Math.sin(inputangle/2),
+    	w: Math.cos(inputangle/2),
+    };
+
+    var axisInv = {
+    	x: -axis.x,
+    	y: -axis.y,
+    	z: -axis.z,
+    	w: axis.w,
+    };
+
+    axis = quaterionMultiply(axis, vector);
+    axis = quaterionMultiply(axis, axisInv);
+
+    return axis;
+}
+
 
 
 /*
@@ -131,40 +168,45 @@ var WorldGenerator = function(world, sphereAmnt, size){
 	this.sphereAmnt = sphereAmnt;
 	this.world = world;
 	this.size = size;
+
+	this.lastPosition = new Models.Vec3(0,0,0);
+	this.lastDirection = null;
+	this.lastRadius = 0;
 }
 WorldGenerator.prototype.generate = function(){
-	var currentX = 0;
-	var currentY = 0;
-	var currentZ = 0;
-	var lastRadius = 0;
-
 	for (var i = 0; i < this.sphereAmnt; ++i){
+		var position = null;
+		var radius = randomInt(3,8);
 		if (i == 0){
-			currentX = random(0, this.size.x-1);
-			currentY = random(0, this.size.y-1);
-			currentZ = random(0, this.size.z-1);
-			lastRadius = 3;
-			this.add(currentX, currentY, currentZ, lastRadius);
+			position = new Models.Vec3(random(0,this.size.x-1), random(0,this.size.y-1), random(0,this.size.z-1));
+			this.add(position, radius);
 
 		} else {
-			var nextPosition = this.getNextPosition(currentX, currentY, currentZ, lastRadius);
-			currentX = nextPosition.x;
-			currentY = nextPosition.y;
-			currentZ = nextPosition.z;
-			lastRadius = 3;
-			this.add(currentX, currentY, currentZ, lastRadius);
+			position = this.getNextPosition(radius);
+			this.add(position, radius);
 		}
+		this.lastRadius = radius;
+		this.lastPosition = position;
 	}
 }
-WorldGenerator.prototype.add = function(x, y, z, radius){
-	this.world.spheres.push(new Models.Sphere(new Models.Vec3(x,y,z), radius));
+WorldGenerator.prototype.add = function(position, radius){
+	this.world.spheres.push(new Models.Sphere(position, radius));
 }
-WorldGenerator.prototype.getNextPosition = function(lastX, lastY, lastZ, lastRadius){
-	var dirX = 2;
-	var dirY = 2;
-	var dirZ = 2;
+WorldGenerator.prototype.getNextPosition = function(thisRadius){
+	var axis = new Models.Vec3(random(-1,1), random(-1,1), random(-1,1)).normalize();
+	var angle = random(-70 * Math.PI / 180, 70 * Math.PI / 180);
+	var lengthToNext = (this.lastRadius + thisRadius) * 0.8;
 
-	return new Models.Vec3(lastX, lastY, lastZ).add(new Models.Vec3(dirX, dirY, dirY));
+	if (!this.lastDirection){
+		this.lastDirection = new Models.Vec3(lengthToNext,0,0);
+
+	} else {
+		this.lastDirection = this.lastDirection.normalize().mult(lengthToNext);
+		var dir = rotateVec(this.lastDirection, axis, angle);
+		this.lastDirection = new Models.Vec3(dir.x, dir.y, dir.z);
+	}
+
+	return this.lastPosition.add(this.lastDirection);
 }
 exports.WorldGenerator = WorldGenerator;
 
