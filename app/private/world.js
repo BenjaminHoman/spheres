@@ -124,8 +124,10 @@ World.prototype.handleClientConnect = function(ws){
 
 	ws.send(JSON.stringify(diffHandler.stateDiff));
 }
-World.prototype.handleClientMessage = function(ws, msg){
-	console.log("client message: " + msg);
+World.prototype.handleClientMessage = function(ws, data){
+	if (data.type == 'event'){
+		ws.client.packet.prevSphere = null;
+	}
 }
 World.prototype.handleClientDisconnect = function(ws){
 	ws.client.packet.hasClient = false;
@@ -145,7 +147,6 @@ World.prototype.broadcastStateDiff = function(unitDiff){
 	for (var i = 0; i < this.clients.length; ++i){
 		try {
 			unitDiff.clientPosition = this.clients[i].client.packet.pos;
-			console.log(JSON.stringify(unitDiff).length);
 			this.clients[i].send(JSON.stringify(unitDiff));
 
 		} catch (err){

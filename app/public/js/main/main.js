@@ -15,9 +15,15 @@ $(document).ready(function(){
 
 	}).begin();
 
-	input = new Input();
 	state = new State();
 	communicationClient = new CommunicationClient();
+	input = new Input();
+
+	input.doClientEvent = function(){
+		communicationClient.send({
+			type: 'event',
+		});
+	}
 });
 
 

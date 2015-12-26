@@ -39,7 +39,7 @@ FrameActuator.prototype.runFrame = function(){
 
 var input = null;
 var Input = function(){
-	this.forward = false;
+	this.doClientEvent = null;
 
 	this.init();
 }
@@ -54,15 +54,15 @@ Input.prototype.init = function(){
 }
 Input.prototype.onKeydown = function(event){
 	switch(event.keyCode){
-		case 87: //W
-			this.forward = true;
+		case 32: //Space
+			this.doClientEvent();
 			break;
 	}
 }
 Input.prototype.onKeyUp = function(event){
 	switch(event.keyCode){
-		case 87: //W
-			this.forward = false;
+		case 32: //Space
+			//this.forward = false;
 			break;
 	}
 }
@@ -87,6 +87,9 @@ var CommunicationClient = function(){
 				state.mergeDiffState(data);
 				break;
 		}
+	}
+	this.send = function(data){
+		this.ws.send(JSON.stringify(data));
 	}
 }
 CommunicationClient.prototype.getUrl = function(){

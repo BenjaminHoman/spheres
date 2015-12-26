@@ -8,7 +8,7 @@ var GraphicsContext = function(){
 		near: 0.1,
 		far: 10000,
 	};
-	this.hideDistThreshhold = 95;
+	this.hideDistThreshhold = 150;
 
 	this.container = null;
 	this.renderer = null;
@@ -34,7 +34,7 @@ GraphicsContext.prototype.init = function(){
 	this.scene.add(this.camera);
 
 	this.renderer.setSize(this.VIEWPORT.width, this.VIEWPORT.height);
-	this.renderer.setClearColor(0xffffff, 1);
+	this.renderer.setClearColor(0x696969, 1);
 
 	this.container.append(this.renderer.domElement);
 
@@ -47,11 +47,8 @@ GraphicsContext.prototype.init = function(){
 }
 GraphicsContext.prototype.createSphere = function(sphere){
 	var radius = sphere.radius;
-	var segments = 9;
-	var rings = 9;
-	//var sphereMaterial = new THREE.MeshLambertMaterial({
-		//color: sphere.color,
-	//});
+	var segments = 8;
+	var rings = 8;
 	var sphereMaterial = new THREE.MeshPhongMaterial({
 		color: sphere.color,
 		shininess: 100.0,

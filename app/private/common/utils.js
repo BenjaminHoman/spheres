@@ -185,7 +185,7 @@ var WorldGenerator = function(world, sphereAmnt, size){
 WorldGenerator.prototype.generate = function(){
 	for (var i = 0; i < this.sphereAmnt; ++i){
 		var position = null;
-		var radius = randomInt(3,8);
+		var radius = randomInt(3,6);
 		if (i == 0){
 			position = new Models.Vec3(random(0,this.size.x-1), random(0,this.size.y-1), random(0,this.size.z-1));
 			this.add(position, radius);
@@ -205,7 +205,7 @@ WorldGenerator.prototype.add = function(position, radius){
 }
 WorldGenerator.prototype.getNextPosition = function(thisRadius){
 	var axis = new Models.Vec3(random(-1,1), random(-1,1), random(-1,1)).normalize();
-	var angle = random(-70 * Math.PI / 180, 70 * Math.PI / 180);
+	var angle = random(-90 * Math.PI / 180, 90 * Math.PI / 180);
 	var lengthToNext = (this.lastRadius + thisRadius) * 0.8;
 
 	if (!this.lastDirection){
@@ -226,38 +226,34 @@ exports.WorldGenerator = WorldGenerator;
 	Defines what is next to a segment or area
 */
 var adjacentDirections = [
-	new Models.Vec3(0,0,0),
-
-	new Models.Vec3(-1,0,0),
-	new Models.Vec3(1,0,0),
-
-	new Models.Vec3(0,-1,0),
+	new Models.Vec3(-1,1,-1),
+	new Models.Vec3(-1,1,0),
+	new Models.Vec3(-1,1,1),
+	new Models.Vec3(0,1,1),
+	new Models.Vec3(1,1,1),
+	new Models.Vec3(1,1,0),
+	new Models.Vec3(1,1,-1),
+	new Models.Vec3(0,1,-1),
 	new Models.Vec3(0,1,0),
 
-	new Models.Vec3(0,0,-1),
+	new Models.Vec3(-1,0,-1),
+	new Models.Vec3(-1,0,0),
+	new Models.Vec3(-1,0,1),
 	new Models.Vec3(0,0,1),
+	new Models.Vec3(1,0,1),
+	new Models.Vec3(1,0,0),
+	new Models.Vec3(1,0,-1),
+	new Models.Vec3(0,0,-1),
+	new Models.Vec3(0,0,0),
 
 	new Models.Vec3(-1,-1,-1),
 	new Models.Vec3(-1,-1,0),
 	new Models.Vec3(-1,-1,1),
-	new Models.Vec3(-1,0,1),
-	new Models.Vec3(-1,1,1),
-	new Models.Vec3(-1,1,0),
-	new Models.Vec3(-1,1,-1),
-	new Models.Vec3(-1,0,-1),
-
-	new Models.Vec3(1,-1,-1),
-	new Models.Vec3(1,-1,0),
-	new Models.Vec3(1,-1,1),
-	new Models.Vec3(1,0,1),
-	new Models.Vec3(1,1,1),
-	new Models.Vec3(1,1,0),
-	new Models.Vec3(1,1,-1),
-	new Models.Vec3(1,0,-1),
-
-	new Models.Vec3(0,-1,-1),
 	new Models.Vec3(0,-1,1),
-	new Models.Vec3(0,1,-1),
-	new Models.Vec3(0,1,1),
+	new Models.Vec3(1,-1,1),
+	new Models.Vec3(1,-1,0),
+	new Models.Vec3(1,-1,-1),
+	new Models.Vec3(0,-1,-1),
+	new Models.Vec3(0,-1,0),
 ];
 exports.adjacentDirections = adjacentDirections;

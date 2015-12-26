@@ -13,7 +13,7 @@ app.ws('/event', function(ws, req) {
 	world.handleClientConnect(ws);
 
 	ws.on('message', function(msg) {
-		world.handleClientMessage(ws, msg);
+		world.handleClientMessage(ws, JSON.parse(msg));
 	});
 
 	ws.on('close', function(){
