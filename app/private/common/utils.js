@@ -190,7 +190,9 @@ WorldGenerator.prototype.generate = function(){
 	}
 }
 WorldGenerator.prototype.add = function(position, radius){
-	this.world.spheres.push(new Models.Sphere(position, radius));
+	var sphere = new Models.Sphere(position, radius);
+	sphere.baseColor = rgbToInt(randomInt(34, 70), randomInt(120, 200), randomInt(100, 200));
+	this.world.spheres.push(sphere);
 }
 WorldGenerator.prototype.getNextPosition = function(thisRadius){
 	var axis = new Models.Vec3(random(-1,1), random(-1,1), random(-1,1)).normalize();

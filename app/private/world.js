@@ -65,9 +65,9 @@ World.prototype.update = function(){
 
 	this.broadcastStateDiff(diffHandler.stateDiff);
 
-	now = Date.now();
-	console.log(now - this.last);
-	this.last = now;
+	//now = Date.now();
+	//console.log(now - this.last);
+	//this.last = now;
 }
 World.prototype.init = function(){
 	this.spheres.push(new Models.Sphere(new Models.Vec3(3,30,3), 5));

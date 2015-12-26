@@ -85,6 +85,7 @@ var Sphere = function(pos, radius){
 	this.radius = radius;
 	this.id = uuid.v1();
 	this.updatedPosition = false;
+	this.baseColor = Utils.rgbToInt(Utils.randomInt(34, 70), Utils.randomInt(120, 200), Utils.randomInt(100, 200));
 	this.color = 0xCC00CC;
 
 	this.inputPackets = [];
@@ -114,7 +115,7 @@ Sphere.prototype.process = function(intersectingSpheres){
 		if (possibleOutSpheres.length > 0 && Math.random() < passProbability){
 			var passIndex = Utils.randomInt(0, possibleOutSpheres.length-1);
 			outPacket.prevSphere = this.id;
-			outPacket.pos = possibleOutSpheres[passIndex].pos
+			outPacket.pos = possibleOutSpheres[passIndex].pos;
 			possibleOutSpheres[passIndex].inputPackets.push(outPacket);
 
 		} else if (outPacket.hasClient){
@@ -128,11 +129,16 @@ Sphere.prototype.postProcess = function(){
 	this.inputPackets = [];
 }
 Sphere.prototype.calculateColor = function(){
-	var intensity = 0;
-	for (var i = 0; i < this.outputPackets.length; ++i){
-		intensity += 100;
+	if (this.outputPackets.length > 0){
+		var intensity = 0;
+		for (var i = 0; i < this.outputPackets.length; ++i){
+			intensity += 100;
+		}
+		this.color = Utils.rgbToInt(Utils.clamp(34+intensity, 0, 255), Utils.clamp(120+intensity, 0, 255), 100);
+
+	} else {
+		this.color = this.baseColor;
 	}
-	this.color = Utils.rgbToInt(Utils.clamp(34+intensity, 0, 255), Utils.clamp(120+intensity, 0, 255), 100);
 }
 Sphere.prototype.debug = function(){
 	console.log(JSON.stringify(this));
