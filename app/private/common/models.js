@@ -85,7 +85,7 @@ var Sphere = function(pos, radius){
 	this.radius = radius;
 	this.id = uuid.v1();
 	this.updatedPosition = false;
-	this.baseColor = Utils.rgbToInt(Utils.randomInt(34, 70), Utils.randomInt(120, 200), Utils.randomInt(100, 200));
+	this.baseColor = Utils.generateRandomBaseColor();
 	this.color = 0xCC00CC;
 
 	this.inputPackets = [];
@@ -130,11 +130,7 @@ Sphere.prototype.postProcess = function(){
 }
 Sphere.prototype.calculateColor = function(){
 	if (this.outputPackets.length > 0){
-		var intensity = 0;
-		for (var i = 0; i < this.outputPackets.length; ++i){
-			intensity += 100;
-		}
-		this.color = Utils.rgbToInt(Utils.clamp(34+intensity, 0, 255), Utils.clamp(120+intensity, 0, 255), 100);
+		this.color = 0x39FF14; //neon green
 
 	} else {
 		this.color = this.baseColor;

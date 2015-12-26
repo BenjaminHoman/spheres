@@ -11,6 +11,11 @@ var rgbToInt = function(r, g, b){
 }
 exports.rgbToInt = rgbToInt;
 
+var generateRandomBaseColor = function(){
+	return rgbToInt(randomInt(24, 60), randomInt(80, 120), randomInt(80, 110));
+}
+exports.generateRandomBaseColor = generateRandomBaseColor;
+
 /*
 	get random number from (low) to (high)
 */
@@ -191,7 +196,7 @@ WorldGenerator.prototype.generate = function(){
 }
 WorldGenerator.prototype.add = function(position, radius){
 	var sphere = new Models.Sphere(position, radius);
-	sphere.baseColor = rgbToInt(randomInt(34, 70), randomInt(120, 200), randomInt(100, 200));
+	sphere.baseColor = generateRandomBaseColor();
 	this.world.spheres.push(sphere);
 }
 WorldGenerator.prototype.getNextPosition = function(thisRadius){

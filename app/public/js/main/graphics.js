@@ -49,8 +49,14 @@ GraphicsContext.prototype.createSphere = function(sphere){
 	var radius = sphere.radius;
 	var segments = 9;
 	var rings = 9;
-	var sphereMaterial = new THREE.MeshLambertMaterial({
+	//var sphereMaterial = new THREE.MeshLambertMaterial({
+		//color: sphere.color,
+	//});
+	var sphereMaterial = new THREE.MeshPhongMaterial({
 		color: sphere.color,
+		shininess: 100.0,
+		emissive: 0x111111,
+		specular: 0x010001,
 	});
 	sphereMaterial.transparent = true;
 	var sphereMesh = new THREE.Mesh(new THREE.SphereGeometry(radius,segments,rings), sphereMaterial);
