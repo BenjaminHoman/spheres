@@ -29,9 +29,16 @@ State.prototype.mergeDiffState = function(diffState){
 			case 'update':
 				if (this.sphereMap[id]){
 					if (unitDiff.data.color){
-						//this.sphereMap[id].sphereMesh.material.color.setHex(unitDiff.data.color);
 						this.sphereMap[id].updateData.color = hexToRGB(unitDiff.data.color);
 						this.spheresToUpdateColor[id] = this.sphereMap[id];
+						if (unitDiff.data.charge){
+							this.sphereMap[id].sphereMesh.material.specular.setHex(0xffffff);
+							this.sphereMap[id].sphereMesh.material.emissive.setHex(0x39FF14);
+
+						} else {
+							this.sphereMap[id].sphereMesh.material.specular.setHex(0x010001);
+							this.sphereMap[id].sphereMesh.material.emissive.setHex(0x111111);
+						}
 					}
 
 					if (unitDiff.data.pos){

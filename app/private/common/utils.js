@@ -154,6 +154,10 @@ DiffHandler.prototype.updateSphereColor = function(sphere){
 	this.createUpdateIfNeeded(sphere);
 	this.stateDiff.unitDiffs[sphere.id].data.color = sphere.color;
 }
+DiffHandler.prototype.updateSphereCharged = function(sphere){
+	this.createUpdateIfNeeded(sphere);
+	this.stateDiff.unitDiffs[sphere.id].data.charge = (sphere.outputPackets.length > 0);
+}
 DiffHandler.prototype.removeSphere = function(sphere){
 	var unitDiff = new Models.UnitDiff().asRemove();
 	this.stateDiff.unitDiffs[sphere.id] = unitDiff;

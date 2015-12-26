@@ -60,6 +60,7 @@ World.prototype.update = function(){
 		this.spheres[i].calculateColor();
 		if (color != this.spheres[i].color){
 			diffHandler.updateSphereColor(this.spheres[i]);
+			diffHandler.updateSphereCharged(this.spheres[i]);
 		}
 	}
 
@@ -144,6 +145,7 @@ World.prototype.broadcastStateDiff = function(unitDiff){
 	for (var i = 0; i < this.clients.length; ++i){
 		try {
 			unitDiff.clientPosition = this.clients[i].client.packet.pos;
+			console.log(JSON.stringify(unitDiff).length);
 			this.clients[i].send(JSON.stringify(unitDiff));
 
 		} catch (err){
