@@ -98,7 +98,7 @@ World.prototype.init = function(){
 		this.spheres.push(new Models.Sphere(new Models.Vec3(Utils.random(100,400), Utils.random(100,400), Utils.random(100,400)), Utils.random(3,8)));
 	}
 
-	var worldGenerator = new Utils.WorldGenerator(this, 100, new Models.Vec3(400,400,400));
+	var worldGenerator = new Utils.WorldGenerator(this, 160, new Models.Vec3(400,400,400));
 	worldGenerator.generate();
 }
 World.prototype.handleClientConnect = function(ws){

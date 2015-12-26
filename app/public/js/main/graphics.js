@@ -8,7 +8,7 @@ var GraphicsContext = function(){
 		near: 0.1,
 		far: 10000,
 	};
-	this.hideDistThreshhold = 80.0;
+	this.hideDistThreshhold = 95;
 
 	this.container = null;
 	this.renderer = null;
@@ -17,6 +17,7 @@ var GraphicsContext = function(){
 	this.light = null;
 
 	this.sphere = null;
+	this.orbitControls = null;
 
 	this.init();
 }
@@ -32,14 +33,17 @@ GraphicsContext.prototype.init = function(){
 
 	this.scene.add(this.camera);
 
-	this.camera.position.z = 1000;
-	this.camera.position.y = 100;
-	this.camera.position.x = 500;
-
 	this.renderer.setSize(this.VIEWPORT.width, this.VIEWPORT.height);
 	this.renderer.setClearColor(0xffffff, 1);
 
 	this.container.append(this.renderer.domElement);
+
+	this.orbitControls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
+	this.orbitControls.enableDamping = true;
+	this.orbitControls.dampingFactor = 0.25;
+	this.orbitControls.enableZoom = true;
+	this.orbitControls.minDistance = 120;
+	this.orbitControls.maxDistance = 200;
 
 	console.log("GraphicsContext init");
 }
@@ -81,7 +85,7 @@ GraphicsContext.prototype.hideNearObjects = function(){
 			var distanceToCamera = distance(node.position, that.camera.position);
 
 			if (distanceToCamera < that.hideDistThreshhold){
-				node.material.opacity = unit * (Math.pow(distanceToCamera, 2) * 0.02);
+				node.material.opacity = (unit * (Math.pow(distanceToCamera, 2) * 0.02));
 			
 			} else {
 				node.material.opacity = 1.0;

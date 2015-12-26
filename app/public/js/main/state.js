@@ -87,14 +87,15 @@ State.prototype.animate = function(delta){
 		}
 	}
 
-	//move camera to target position
-	var newPos = cameraFollowAtDistance(graphicsContext.camera.position, this.cameraTargetLocation, delta, 150, 0.1);
-	if (newPos){
-		graphicsContext.camera.position.x = newPos.x;
-		graphicsContext.camera.position.y = newPos.y;
-		graphicsContext.camera.position.z = newPos.z;
+	if (!isEqualVec(graphicsContext.orbitControls.target, this.cameraTargetLocation)){
+		var epsilon = 0.1;
+		var newPos = moveToTarget(graphicsContext.orbitControls.target, this.cameraTargetLocation, delta, 0.005, epsilon);
+		if (newPos){
+			graphicsContext.orbitControls.target.x = newPos.x;
+			graphicsContext.orbitControls.target.y = newPos.y;
+			graphicsContext.orbitControls.target.z = newPos.z;
+		}
 	}
-	graphicsContext.camera.lookAt(new THREE.Vector3(this.cameraTargetLocation.x, this.cameraTargetLocation.y, this.cameraTargetLocation.z));
 }
 State.prototype.animateMovement = function(id, clientSphere, delta){
 	var epsilon = 0.1;
