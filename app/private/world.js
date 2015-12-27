@@ -66,9 +66,9 @@ World.prototype.update = function(){
 
 	this.broadcastStateDiff(diffHandler.stateDiff);
 
-	//now = Date.now();
-	//console.log(now - this.last);
-	//this.last = now;
+	now = Date.now();
+	console.log(now - this.last);
+	this.last = now;
 }
 World.prototype.init = function(){
 	this.spheres.push(new Models.Sphere(new Models.Vec3(3,30,3), 5));
@@ -100,6 +100,12 @@ World.prototype.init = function(){
 	}
 	for (var i = 0; i < 10; ++i){
 		new Utils.WorldGenerator(this, 40, new Models.Vec3(400,400,400)).generate();
+	}
+
+	for (var x = 0; x < 10*8; x += 8){
+		for (var y = 0; y < 10*8; y += 8){
+			this.spheres.push(new Models.Sphere(new Models.Vec3(100+x,12,100+y), 4));
+		}
 	}
 }
 World.prototype.handleClientConnect = function(ws){
