@@ -31,7 +31,7 @@ var World = function(){
 World.prototype.update = function(){
 	var diffHandler = new Utils.DiffHandler();
 
-	this.spheres[Utils.randomInt(0,this.spheres.length-1)].inputPackets.push(new Models.Packet({
+	this.spheres[Utils.randomInt(0,this.spheres.length-1)].pushPacket(new Models.Packet({
 		prevSphere: null,
 		energy: 2,
 		hasClient: false,
@@ -110,7 +110,7 @@ World.prototype.handleClientConnect = function(ws){
 		hasClient: true,
 		pos: this.spheres[initSphere].pos,
 	});
-	this.spheres[initSphere].inputPackets.push(clientPacket);
+	this.spheres[initSphere].pushPacket(clientPacket);
 
 	ws.client = new Models.Client(clientPacket);
 	console.log("Client connected: " + ws.client.id);
@@ -125,8 +125,28 @@ World.prototype.handleClientConnect = function(ws){
 	ws.send(JSON.stringify(diffHandler.stateDiff));
 }
 World.prototype.handleClientMessage = function(ws, data){
-	if (data.type == 'event'){
-		ws.client.packet.prevSphere = null;
+	switch (data.dir){
+		case 'up':
+			ws.client.packet.nextSphere = Utils.getUpmostSphere(this.collisionGrid.getIntersections(ws.client.packet.currentSphere));
+			break;
+		case 'down':
+			ws.client.packet.nextSphere = Utils.getDownmostSphere(this.collisionGrid.getIntersections(ws.client.packet.currentSphere));
+			break;
+		case 'left':
+			ws.client.packet.nextSphere = Utils.getLeftmostSphere(this.collisionGrid.getIntersections(ws.client.packet.currentSphere));
+			break;
+		case 'right':
+			ws.client.packet.nextSphere = Utils.getRightmostSphere(this.collisionGrid.getIntersections(ws.client.packet.currentSphere));
+			break;
+		case 'forward':
+			ws.client.packet.nextSphere = Utils.getForwardmostSphere(this.collisionGrid.getIntersections(ws.client.packet.currentSphere));
+			break;
+		case 'backward':
+			ws.client.packet.nextSphere = Utils.getBackwardmostSphere(this.collisionGrid.getIntersections(ws.client.packet.currentSphere));
+			break;
+		default:
+			ws.client.packet.nextSphere = null;
+			break;
 	}
 }
 World.prototype.handleClientDisconnect = function(ws){

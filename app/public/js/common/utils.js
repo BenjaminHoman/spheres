@@ -39,7 +39,12 @@ FrameActuator.prototype.runFrame = function(){
 
 var input = null;
 var Input = function(){
-	this.doClientEvent = null;
+	this.doLeft = null;
+	this.doRight = null;
+	this.doUp = null;
+	this.doDown = null;
+	this.doForward = null;
+	this.doBackward = null;
 
 	this.init();
 }
@@ -48,21 +53,26 @@ Input.prototype.init = function(){
 	$(window).on('keydown', function(event){
 		that.onKeydown(event);
 	});
-	$(window).on('keyup', function(event){
-		that.onKeyUp(event);
-	});
 }
 Input.prototype.onKeydown = function(event){
 	switch(event.keyCode){
-		case 32: //Space
-			this.doClientEvent();
+		case 87: //W
+			this.doUp();
 			break;
-	}
-}
-Input.prototype.onKeyUp = function(event){
-	switch(event.keyCode){
-		case 32: //Space
-			//this.forward = false;
+		case 83: //D
+			this.doDown();
+			break;
+		case 65: //A
+			this.doLeft();
+			break;
+		case 68: //D
+			this.doRight();
+			break;
+		case 82: //R
+			this.doForward();
+			break;
+		case 70: //F
+			this.doBackward();
 			break;
 	}
 }

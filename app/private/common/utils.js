@@ -257,3 +257,58 @@ var adjacentDirections = [
 	new Models.Vec3(0,-1,0),
 ];
 exports.adjacentDirections = adjacentDirections;
+
+var getNmostSphere = function(spheres, moreMost){
+	var nmost = null;
+	for (var i = 0; i < spheres.length; ++i){
+		if (i == 0){
+			nmost = spheres[i];
+
+		} else if (moreMost(nmost, spheres[i])){
+			nmost = spheres[i];
+		}
+	}
+	return nmost;
+}
+
+var getLeftmostSphere = function(spheres){
+	return getNmostSphere(spheres, function(leftMost, otherSphere){
+		return (leftMost.pos.x > otherSphere.pos.x);
+	});
+}
+exports.getLeftmostSphere = getLeftmostSphere;
+
+var getRightmostSphere = function(spheres){
+	return getNmostSphere(spheres, function(rightMost, otherSphere){
+		return (rightMost.pos.x < otherSphere.pos.x);
+	});
+}
+exports.getRightmostSphere = getRightmostSphere;
+
+var getUpmostSphere = function(spheres){
+	return getNmostSphere(spheres, function(upMost, otherSphere){
+		return (upMost.pos.y < otherSphere.pos.y);
+	});
+}
+exports.getUpmostSphere = getUpmostSphere;
+
+var getDownmostSphere = function(spheres){
+	return getNmostSphere(spheres, function(downMost, otherSphere){
+		return (downMost.pos.y > otherSphere.pos.y);
+	});
+}
+exports.getDownmostSphere = getDownmostSphere;
+
+var getForwardmostSphere = function(spheres){
+	return getNmostSphere(spheres, function(forwardMost, otherSphere){
+		return (forwardMost.pos.z > otherSphere.pos.z);
+	});
+}
+exports.getForwardmostSphere = getForwardmostSphere;
+
+var getBackwardmostSphere = function(spheres){
+	return getNmostSphere(spheres, function(backwardMost, otherSphere){
+		return (backwardMost.pos.z < otherSphere.pos.z);
+	});
+}
+exports.getBackwardmostSphere = getBackwardmostSphere;
