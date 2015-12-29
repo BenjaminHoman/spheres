@@ -5,9 +5,10 @@ var state = null;
 	ClientSphere
 		holds information for client the sphere
 */
-var ClientSphere = function(sphereMesh){
+var ClientSphere = function(sphereMesh, baseColor){
 	this.sphereMesh = sphereMesh;
 	this.updateData = {};
+	this.baseColor = baseColor;
 }
 
 var State = function(){
@@ -28,17 +29,8 @@ State.prototype.mergeDiffState = function(diffState){
 		switch (unitDiff.type){
 			case 'update':
 				if (this.sphereMap[id]){
-					if (unitDiff.data.color){
-						this.sphereMap[id].updateData.color = hexToRGB(unitDiff.data.color);
-						this.spheresToUpdateColor[id] = this.sphereMap[id];
-						if (unitDiff.data.charge){
-							this.sphereMap[id].sphereMesh.material.specular.setHex(0xffffff);
-							this.sphereMap[id].sphereMesh.material.emissive.setHex(0x39FF14);
-
-						} else {
-							this.sphereMap[id].sphereMesh.material.specular.setHex(0x010001);
-							this.sphereMap[id].sphereMesh.material.emissive.setHex(0x111111);
-						}
+					if (unitDiff.data.charge){
+						this.handleChargeUpdate(id, unitDiff.data.charge, true);
 					}
 
 					if (unitDiff.data.pos){
@@ -54,7 +46,9 @@ State.prototype.mergeDiffState = function(diffState){
 					pos: unitDiff.data.pos,
 					radius: unitDiff.data.radius,
 					color: unitDiff.data.color,
-				}));
+
+				}), hexToRGB(unitDiff.data.color));
+				this.handleChargeUpdate(id, unitDiff.data.charge, false);
 				break;
 			case 'remove':
 				graphicsContext.removeSphere(this.sphereMap[id]);
@@ -66,17 +60,33 @@ State.prototype.mergeDiffState = function(diffState){
 		this.cameraTargetLocation = diffState.clientPosition;
 	}
 }
-State.prototype.put = function(sphere){
-	this.sphereMap[sphere.sphere.id] = sphere;
-}
-State.prototype.get = function(sphere){
-	return this.sphereMap[sphere.id];
-}
-State.prototype.has = function(sphere){
-	if (this.sphereMap[sphere.id]){
-		return true;
+State.prototype.handleChargeUpdate = function(sphereId, charge, shouldAnimate){
+	switch (charge){
+		case 'D': //Default
+			this.sphereMap[sphereId].sphereMesh.material.specular.setHex(0x010001);
+			this.sphereMap[sphereId].sphereMesh.material.emissive.setHex(0x111111);
+			if (shouldAnimate){
+				this.sphereMap[sphereId].updateData.color = this.sphereMap[sphereId].baseColor;
+				this.spheresToUpdateColor[sphereId] = this.sphereMap[sphereId];
+			}
+			break;
+		case 'C': //Charged
+			this.sphereMap[sphereId].sphereMesh.material.specular.setHex(0x010001);
+			this.sphereMap[sphereId].sphereMesh.material.emissive.setHex(0x111111);
+			if (shouldAnimate){
+				this.sphereMap[sphereId].updateData.color = {r: 0.2235, g: 1.0, b: 0.07843};
+				this.spheresToUpdateColor[sphereId] = this.sphereMap[sphereId];
+			}
+			break;
+		case 'P': //Player
+			this.sphereMap[sphereId].sphereMesh.material.specular.setHex(0xffffff);
+			this.sphereMap[sphereId].sphereMesh.material.emissive.setHex(0x39FF14);
+			if (shouldAnimate){
+				this.sphereMap[sphereId].updateData.color = {r: 0.2235, g: 1.0, b: 0.07843};
+				this.spheresToUpdateColor[sphereId] = this.sphereMap[sphereId];
+			}
+			break;
 	}
-	return false;
 }
 State.prototype.animate = function(delta){
 	for (var id in this.spheresToUpdatePosition){
@@ -125,6 +135,7 @@ State.prototype.animateColorChange = function(id, clientSphere, delta){
 	if (!newColorVec){
 		delete clientSphere.updateData.color;
 		delete this.spheresToUpdateColor[id];
+		console.log("ended color anim");
 
 	} else {
 		clientSphere.sphereMesh.material.color.r = newColorVec.x;

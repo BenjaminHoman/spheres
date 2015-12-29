@@ -143,6 +143,7 @@ DiffHandler.prototype.createSphere = function(sphere){
 		pos: sphere.pos,
 		radius: sphere.radius,
 		color: sphere.color,
+		charge: sphere.charge,
 	};
 	this.stateDiff.unitDiffs[sphere.id] = unitDiff;
 }
@@ -150,13 +151,9 @@ DiffHandler.prototype.updateSpherePosition = function(sphere){
 	this.createUpdateIfNeeded(sphere);
 	this.stateDiff.unitDiffs[sphere.id].data.pos = sphere.pos;
 }
-DiffHandler.prototype.updateSphereColor = function(sphere){
+DiffHandler.prototype.updateSphereCharge = function(sphere){
 	this.createUpdateIfNeeded(sphere);
-	this.stateDiff.unitDiffs[sphere.id].data.color = sphere.color;
-}
-DiffHandler.prototype.updateSphereCharged = function(sphere){
-	this.createUpdateIfNeeded(sphere);
-	this.stateDiff.unitDiffs[sphere.id].data.charge = (sphere.outputPackets.length > 0);
+	this.stateDiff.unitDiffs[sphere.id].data.charge = sphere.charge;
 }
 DiffHandler.prototype.removeSphere = function(sphere){
 	var unitDiff = new Models.UnitDiff().asRemove();

@@ -80,17 +80,20 @@ Vec3.prototype.debug = function(){
 exports.Vec3 = Vec3;
 
 
+const TYPE_CHARGED = 'C';
+const TYPE_PLAYER = 'P';
+const TYPE_DEFAULT = 'D';
 var Sphere = function(pos, radius){
 	this.pos = pos;
 	this.radius = radius;
+	this.color = Utils.generateRandomBaseColor();
 	this.id = uuid.v1();
-	this.updatedPosition = false;
-	this.baseColor = Utils.generateRandomBaseColor();
-	this.color = 0xCC00CC;
 
 	this.inputPackets = [];
 	this.outputPackets = [];
 	this.outputClientPackets = [];
+
+	this.charge = TYPE_DEFAULT;
 }
 Sphere.prototype.intersects = function(sphere){
 	return (this.pos.distance(sphere.pos) <= this.radius + sphere.radius);
@@ -102,31 +105,17 @@ var passProbability = 0.92;
 Sphere.prototype.process = function(intersectingSpheres){
 	for (var i = 0; i < this.outputPackets.length; ++i){
 		var outPacket = this.outputPackets[i];
+		var possibleOutSpheres = this.getPossibleOutSpheres(intersectingSpheres, outPacket);
 
-		var possibleOutSpheres = [];
-		for (var j = 0; j < intersectingSpheres.length; ++j){
-			var intersectingSphere = intersectingSpheres[j];
-
-			if (intersectingSphere.id != outPacket.prevSphere){
-				possibleOutSpheres.push(intersectingSphere);
+		if (possibleOutSpheres.length > 0 && !outPacket.hasClient){
+			if (Math.random() < passProbability){
+				outPacket.prevSphere = this.id;
+				possibleOutSpheres[Utils.randomInt(0, possibleOutSpheres.length)].pushPacket(outPacket);
 			}
-		}
 
-		if (possibleOutSpheres.length > 0){
-			if (!outPacket.hasClient){
-				if (Math.random() < passProbability){
-					var passIndex = Utils.randomInt(0, possibleOutSpheres.length);
-					outPacket.prevSphere = this.id;
-					possibleOutSpheres[passIndex].pushPacket(outPacket);
-				}
-
-			} else if (outPacket.nextSphere){
-				outPacket.nextSphere.pushPacket(outPacket);
-				outPacket.nextSphere = null;
-				
-			} else {
-				this.outputClientPackets.push(outPacket);
-			}
+		} else if (outPacket.hasClient && outPacket.nextSphere){
+			outPacket.nextSphere.pushPacket(outPacket);
+			outPacket.nextSphere = null;
 
 		} else if (outPacket.hasClient){
 			this.outputClientPackets.push(outPacket);
@@ -134,22 +123,41 @@ Sphere.prototype.process = function(intersectingSpheres){
 	}
 }
 Sphere.prototype.postProcess = function(){
-	this.outputPackets = this.inputPackets.concat(this.outputClientPackets);
+	this.outputPackets = this.outputClientPackets.concat(this.inputPackets);
 	this.outputClientPackets = [];
 	this.inputPackets = [];
+
+	this.calculateCharge();
 }
-Sphere.prototype.calculateColor = function(){
+Sphere.prototype.calculateCharge = function(){
 	if (this.outputPackets.length > 0){
-		this.color = 0x39FF14; //neon green
+		for (var i = 0; i < this.outputPackets.length; ++i){
+			if (this.outputPackets[i].hasClient){
+				this.charge = TYPE_PLAYER;
+				return;
+			}
+		}
+		this.charge = TYPE_CHARGED;
 
 	} else {
-		this.color = this.baseColor;
+		this.charge = TYPE_DEFAULT;
 	}
 }
 Sphere.prototype.pushPacket = function(packet){
 	packet.currentSphere = this;
 	packet.pos = this.pos;
 	this.inputPackets.push(packet);
+}
+Sphere.prototype.getPossibleOutSpheres = function(intersectingSpheres, packet){
+	var possibleOutSpheres = [];
+	for (var j = 0; j < intersectingSpheres.length; ++j){
+		var intersectingSphere = intersectingSpheres[j];
+
+		if (intersectingSphere.id != packet.prevSphere){
+			possibleOutSpheres.push(intersectingSphere);
+		}
+	}
+	return possibleOutSpheres;
 }
 Sphere.prototype.debug = function(){
 	console.log(JSON.stringify(this));

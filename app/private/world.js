@@ -31,12 +31,12 @@ var World = function(){
 World.prototype.update = function(){
 	var diffHandler = new Utils.DiffHandler();
 
-	this.spheres[Utils.randomInt(0,this.spheres.length-1)].pushPacket(new Models.Packet({
-		prevSphere: null,
-		energy: 2,
-		hasClient: false,
-		pos: null,
-	}));
+	// this.spheres[Utils.randomInt(0,this.spheres.length-1)].pushPacket(new Models.Packet({
+	// 	prevSphere: null,
+	// 	energy: 2,
+	// 	hasClient: false,
+	// 	pos: null,
+	// }));
 
 	//this.spheres[0].pos = this.spheres[0].pos.add(new Models.Vec3(2,1,0));
 	//diffHandler.updateSpherePosition(this.spheres[0]);
@@ -53,22 +53,20 @@ World.prototype.update = function(){
 		sphere.process(sphereIntersections);
 	}
 	for (var i = 0; i < this.spheres.length; ++i){
+		var lastCharge = this.spheres[i].charge;
 
 		this.spheres[i].postProcess();
 
-		var color = this.spheres[i].color;
-		this.spheres[i].calculateColor();
-		if (color != this.spheres[i].color){
-			diffHandler.updateSphereColor(this.spheres[i]);
-			diffHandler.updateSphereCharged(this.spheres[i]);
+		if (lastCharge != this.spheres[i].charge){
+			diffHandler.updateSphereCharge(this.spheres[i]);
 		}
 	}
 
 	this.broadcastStateDiff(diffHandler.stateDiff);
 
-	now = Date.now();
-	console.log(now - this.last);
-	this.last = now;
+	//now = Date.now();
+	//console.log(now - this.last);
+	//this.last = now;
 }
 World.prototype.init = function(){
 	this.spheres.push(new Models.Sphere(new Models.Vec3(3,30,3), 5));
@@ -107,6 +105,7 @@ World.prototype.init = function(){
 			this.spheres.push(new Models.Sphere(new Models.Vec3(100+x,12,100+y), 4));
 		}
 	}
+	console.log("initialized world with " + this.spheres.length + " spheres");
 }
 World.prototype.handleClientConnect = function(ws){
 	var initSphere = Utils.randomInt(0, this.spheres.length-1);
@@ -170,6 +169,7 @@ World.prototype.removeClientWithWs = function(ws){
 	console.error("trying to remove client that is not connected");
 }
 World.prototype.broadcastStateDiff = function(unitDiff){
+	//console.log(JSON.stringify(unitDiff).length);
 	for (var i = 0; i < this.clients.length; ++i){
 		try {
 			unitDiff.clientPosition = this.clients[i].client.packet.pos;
