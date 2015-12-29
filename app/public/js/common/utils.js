@@ -141,3 +141,60 @@ var moveToTarget = function(vec, target, delta, scale, epsilon){
 		return null;
 	}
 }
+
+
+/*
+	camera utils
+*/
+
+var moveDirections = [
+	{vec: {x: 1, y: 0, z: 0}, name: 'right'},
+	{vec: {x: -1, y: 0, z: 0}, name: 'left'},
+	{vec: {x: 0, y: 1, z: 0}, name: 'up'},
+	{vec: {x: 0, y: -1, z: 0}, name: 'down'},
+	{vec: {x: 0, y: 0, z: -1}, name: 'forward'},
+	{vec: {x: 0, y: 0, z: 1}, name: 'backward'},
+];
+
+var getClosestGlobalDirection = function(dir){
+	var closest = null;
+	var closestDist = null;
+	for (var i = 0; i < moveDirections.length; ++i){
+		if (i == 0){
+			closest = moveDirections[i];
+			closestDist = distance(dir, moveDirections[i].vec);
+
+		} else {
+			var dist = distance(dir, moveDirections[i].vec);
+			if (dist < closestDist){
+				closest = moveDirections[i];
+				closestDist = dist;
+			}
+		}
+	}
+	return closest;
+}
+
+var getCameraForward = function(camera){
+	return new THREE.Vector3(0,0,-1).applyMatrix4(camera.matrixWorld).sub(camera.position).normalize();
+}
+
+var getCameraBackward = function(camera){
+	return new THREE.Vector3(0,0,1).applyMatrix4(camera.matrixWorld).sub(camera.position).normalize();
+}
+
+var getCameraUp = function(camera){
+	return new THREE.Vector3(0,1,0).applyMatrix4(camera.matrixWorld).sub(camera.position).normalize();
+}
+
+var getCameraDown = function(camera){
+	return new THREE.Vector3(0,-1,0).applyMatrix4(camera.matrixWorld).sub(camera.position).normalize();
+}
+
+var getCameraLeft = function(camera){
+	return new THREE.Vector3(-1,0,0).applyMatrix4(camera.matrixWorld).sub(camera.position).normalize();
+}
+
+var getCameraRight = function(camera){
+	return new THREE.Vector3(1,0,0).applyMatrix4(camera.matrixWorld).sub(camera.position).normalize();
+}

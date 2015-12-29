@@ -135,7 +135,6 @@ State.prototype.animateColorChange = function(id, clientSphere, delta){
 	if (!newColorVec){
 		delete clientSphere.updateData.color;
 		delete this.spheresToUpdateColor[id];
-		console.log("ended color anim");
 
 	} else {
 		clientSphere.sphereMesh.material.color.r = newColorVec.x;

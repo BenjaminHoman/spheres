@@ -21,32 +21,32 @@ $(document).ready(function(){
 
 	input.doUp = function(){
 		communicationClient.send({
-			dir: 'up',
+			dir: getClosestGlobalDirection(getCameraUp(graphicsContext.camera)).name,
 		});
 	}
 	input.doDown = function(){
 		communicationClient.send({
-			dir: 'down',
+			dir: getClosestGlobalDirection(getCameraDown(graphicsContext.camera)).name,
 		});
 	}
 	input.doLeft = function(){
 		communicationClient.send({
-			dir: 'left',
+			dir: getClosestGlobalDirection(getCameraLeft(graphicsContext.camera)).name,
 		});
 	}
 	input.doRight = function(){
 		communicationClient.send({
-			dir: 'right',
+			dir: getClosestGlobalDirection(getCameraRight(graphicsContext.camera)).name,
 		});
 	}
 	input.doForward = function(){
 		communicationClient.send({
-			dir: 'forward',
+			dir: getClosestGlobalDirection(getCameraForward(graphicsContext.camera)).name,
 		});
 	}
 	input.doBackward = function(){
 		communicationClient.send({
-			dir: 'backward',
+			dir: getClosestGlobalDirection(getCameraBackward(graphicsContext.camera)).name,
 		});
 	}
 });
