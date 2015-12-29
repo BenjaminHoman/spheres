@@ -31,12 +31,12 @@ var World = function(){
 World.prototype.update = function(){
 	var diffHandler = new Utils.DiffHandler();
 
-	// this.spheres[Utils.randomInt(0,this.spheres.length-1)].pushPacket(new Models.Packet({
-	// 	prevSphere: null,
-	// 	energy: 2,
-	// 	hasClient: false,
-	// 	pos: null,
-	// }));
+	this.spheres[Utils.randomInt(0,this.spheres.length-1)].pushPacket(new Models.Packet({
+		prevSphere: null,
+		energy: 2,
+		hasClient: false,
+		pos: null,
+	}));
 
 	//this.spheres[0].pos = this.spheres[0].pos.add(new Models.Vec3(2,1,0));
 	//diffHandler.updateSpherePosition(this.spheres[0]);

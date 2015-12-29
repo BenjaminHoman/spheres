@@ -68,14 +68,22 @@ State.prototype.handleChargeUpdate = function(sphereId, charge, shouldAnimate){
 			if (shouldAnimate){
 				this.sphereMap[sphereId].updateData.color = this.sphereMap[sphereId].baseColor;
 				this.spheresToUpdateColor[sphereId] = this.sphereMap[sphereId];
+			} else {
+				this.sphereMap[sphereId].sphereMesh.material.color.r = this.sphereMap[sphereId].baseColor.r;
+				this.sphereMap[sphereId].sphereMesh.material.color.g = this.sphereMap[sphereId].baseColor.g;
+				this.sphereMap[sphereId].sphereMesh.material.color.b = this.sphereMap[sphereId].baseColor.b;
 			}
 			break;
 		case 'C': //Charged
 			this.sphereMap[sphereId].sphereMesh.material.specular.setHex(0x010001);
-			this.sphereMap[sphereId].sphereMesh.material.emissive.setHex(0x111111);
+			this.sphereMap[sphereId].sphereMesh.material.emissive.setHex(0x222222);
 			if (shouldAnimate){
 				this.sphereMap[sphereId].updateData.color = {r: 0.2235, g: 1.0, b: 0.07843};
 				this.spheresToUpdateColor[sphereId] = this.sphereMap[sphereId];
+			} else {
+				this.sphereMap[sphereId].sphereMesh.material.color.r = 0.2235;
+				this.sphereMap[sphereId].sphereMesh.material.color.g = 1.0;
+				this.sphereMap[sphereId].sphereMesh.material.color.b = 0.07843;
 			}
 			break;
 		case 'P': //Player
@@ -84,6 +92,10 @@ State.prototype.handleChargeUpdate = function(sphereId, charge, shouldAnimate){
 			if (shouldAnimate){
 				this.sphereMap[sphereId].updateData.color = {r: 0.2235, g: 1.0, b: 0.07843};
 				this.spheresToUpdateColor[sphereId] = this.sphereMap[sphereId];
+			} else {
+				this.sphereMap[sphereId].sphereMesh.material.color.r = 0.2235;
+				this.sphereMap[sphereId].sphereMesh.material.color.g = 1.0;
+				this.sphereMap[sphereId].sphereMesh.material.color.b = 0.07843;
 			}
 			break;
 	}
