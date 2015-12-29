@@ -5,11 +5,41 @@ var state = null;
 	ClientSphere
 		holds information for client the sphere
 */
+var start = Date.now();
 var ClientSphere = function(sphereMesh, baseColor){
 	this.sphereMesh = sphereMesh;
 	this.updateData = {};
 	this.baseColor = baseColor;
+	this.charge = 'D';
+
+	this.token = null;
 }
+ClientSphere.prototype.applyToken = function(delta){
+	var tokenPosition = {
+		x: this.sphereMesh.position.x,
+		y: this.sphereMesh.position.y + 10 + Math.sin((start - Date.now()) * 0.01),
+		z: this.sphereMesh.position.z,
+	};
+	if (!this.token){
+		var token = graphicsContext.createToken(tokenPosition);
+		if (token){
+			this.token = token;
+		}
+
+	} else {
+		this.token.position.x = tokenPosition.x;
+		this.token.position.y = tokenPosition.y;
+		this.token.position.z = tokenPosition.z;
+		this.token.rotation.y += 0.005 * delta;
+	}
+}
+ClientSphere.prototype.unapplyToken = function(){
+	if (this.token){
+		graphicsContext.removeMesh(this.token);
+		this.token = null;
+	}
+}
+
 
 var State = function(){
 	this.cameraTargetLocation = {
@@ -51,7 +81,7 @@ State.prototype.mergeDiffState = function(diffState){
 				this.handleChargeUpdate(id, unitDiff.data.charge, false);
 				break;
 			case 'remove':
-				graphicsContext.removeSphere(this.sphereMap[id]);
+				graphicsContext.removeMesh(this.sphereMap[id].sphereMesh);
 				delete this.sphereMap[id];
 				break;
 		}
@@ -61,6 +91,7 @@ State.prototype.mergeDiffState = function(diffState){
 	}
 }
 State.prototype.handleChargeUpdate = function(sphereId, charge, shouldAnimate){
+	this.sphereMap[sphereId].charge = charge;
 	switch (charge){
 		case 'D': //Default
 			this.sphereMap[sphereId].sphereMesh.material.specular.setHex(0x010001);
@@ -75,10 +106,10 @@ State.prototype.handleChargeUpdate = function(sphereId, charge, shouldAnimate){
 			}
 			break;
 		case 'C': //Charged
-			this.sphereMap[sphereId].sphereMesh.material.specular.setHex(0x010001);
-			this.sphereMap[sphereId].sphereMesh.material.emissive.setHex(0x222222);
+			this.sphereMap[sphereId].sphereMesh.material.specular.setHex(0xffffff);
+			this.sphereMap[sphereId].sphereMesh.material.emissive.setHex(0xff891f);
 			if (shouldAnimate){
-				this.sphereMap[sphereId].updateData.color = {r: 0.2235, g: 1.0, b: 0.07843};
+				this.sphereMap[sphereId].updateData.color = {r: 1.0, g: 0.5372, b: 0.1215};
 				this.spheresToUpdateColor[sphereId] = this.sphereMap[sphereId];
 			} else {
 				this.sphereMap[sphereId].sphereMesh.material.color.r = 0.2235;
@@ -101,6 +132,16 @@ State.prototype.handleChargeUpdate = function(sphereId, charge, shouldAnimate){
 	}
 }
 State.prototype.animate = function(delta){
+	for (var id in this.sphereMap){
+		var clientSphere = this.sphereMap[id];
+
+		if (clientSphere.charge == 'C'){
+			clientSphere.applyToken(delta);
+
+		} else {
+			clientSphere.unapplyToken();
+		}
+	}
 	for (var id in this.spheresToUpdatePosition){
 		var clientSphere = this.spheresToUpdatePosition[id];
 

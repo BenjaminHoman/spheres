@@ -101,7 +101,7 @@ Sphere.prototype.intersects = function(sphere){
 /*
 	push output packets to intersecting spheres
 */
-var passProbability = 0.92;
+var passProbability = 0.98;
 Sphere.prototype.process = function(intersectingSpheres){
 	for (var i = 0; i < this.outputPackets.length; ++i){
 		var outPacket = this.outputPackets[i];

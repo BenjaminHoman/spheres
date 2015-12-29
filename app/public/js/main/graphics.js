@@ -19,7 +19,24 @@ var GraphicsContext = function(){
 	this.sphere = null;
 	this.orbitControls = null;
 
+	this.tokenGeometry = null;
+	this.tokenMaterial = null;
+
 	this.init();
+}
+GraphicsContext.prototype.loadTokenGeometry = function(){
+	var loader = new THREE.JSONLoader();
+	var that = this;
+	loader.load("/obj/token.js", function(geometry){
+		that.tokenGeometry = geometry;
+		that.tokenGeometry.scale(1.3,1.3,1.3);
+		that.tokenMaterial = new THREE.MeshPhongMaterial({
+			color: 0xff891f,
+			shininess: 80.0,
+			emissive: 0xff891f,
+			specular: 0xffffff,
+		});
+	});
 }
 GraphicsContext.prototype.init = function(){
 	this.container = $("#renderContainer");
@@ -44,6 +61,8 @@ GraphicsContext.prototype.init = function(){
 	this.orbitControls.enableZoom = true;
 	this.orbitControls.minDistance = 120;
 	this.orbitControls.maxDistance = 200;
+
+	this.loadTokenGeometry();
 }
 GraphicsContext.prototype.createSphere = function(sphere){
 	var radius = sphere.radius;
@@ -63,8 +82,19 @@ GraphicsContext.prototype.createSphere = function(sphere){
 	this.scene.add(sphereMesh);
 	return sphereMesh;
 }
-GraphicsContext.prototype.removeSphere = function(sphereMesh){
-    this.scene.remove(sphereMesh);
+GraphicsContext.prototype.createToken = function(position){
+	if (!this.tokenGeometry || !this.tokenMaterial){
+		return null;
+	}
+	var token = new THREE.Mesh(this.tokenGeometry, this.tokenMaterial);
+	token.position.x = position.x;
+	token.position.y = position.y;
+	token.position.z = position.z;
+	this.scene.add(token);
+	return token;
+}
+GraphicsContext.prototype.removeMesh = function(mesh){
+    this.scene.remove(mesh);
 }
 GraphicsContext.prototype.resize = function(){
 	this.VIEWPORT.width = window.innerWidth;
