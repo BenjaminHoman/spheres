@@ -3,8 +3,10 @@ var app = express();
 var expressWs = require('express-ws')(app);
 var favicon = require('serve-favicon');
 var World = require('./private/World.js');
+var WorldLoader = require('./private/loader/worldLoader.js');
 
-var world = new World.World();
+
+var world = new World.World(new WorldLoader.WorldLoader("./levels/world1.obj"));
 
 app.use(express.static('public'));
 app.use(favicon(__dirname + '/public/img/favicon.ico'));

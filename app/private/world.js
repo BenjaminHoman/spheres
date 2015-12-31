@@ -5,7 +5,9 @@ var Utils = require("./common/utils.js");
 	World
 		holds references to all web sockets wich have client object tacked to them
 */
-var World = function(){
+var World = function(worldLoader){
+	this.worldLoader = worldLoader;
+
 	this.clients = [];
 
 	this.worldPos = new Models.Vec3(0,0,0);
@@ -71,42 +73,44 @@ World.prototype.update = function(){
 	//this.last = now;
 }
 World.prototype.init = function(){
-	this.spheres.push(new Models.Sphere(new Models.Vec3(3,30,3), 5));
-	this.spheres.push(new Models.Sphere(new Models.Vec3(10,63,3), 2));
-	this.spheres.push(new Models.Sphere(new Models.Vec3(3,40,3), 7));
+	this.worldLoader.loadInto(this);
 
-	this.spheres.push(new Models.Sphere(new Models.Vec3(14,12,2), 4));
- 	this.spheres.push(new Models.Sphere(new Models.Vec3(22,12,2), 4));
- 	this.spheres.push(new Models.Sphere(new Models.Vec3(30,12,2), 4));
- 	this.spheres.push(new Models.Sphere(new Models.Vec3(38,12,2), 4));
- 	this.spheres.push(new Models.Sphere(new Models.Vec3(46,12,2), 4));
- 	this.spheres.push(new Models.Sphere(new Models.Vec3(54,12,2), 4));
- 	this.spheres.push(new Models.Sphere(new Models.Vec3(62,12,2), 4));
+	// this.spheres.push(new Models.Sphere(new Models.Vec3(3,30,3), 5));
+	// this.spheres.push(new Models.Sphere(new Models.Vec3(10,63,3), 2));
+	// this.spheres.push(new Models.Sphere(new Models.Vec3(3,40,3), 7));
+
+	// this.spheres.push(new Models.Sphere(new Models.Vec3(14,12,2), 4));
+ // 	this.spheres.push(new Models.Sphere(new Models.Vec3(22,12,2), 4));
+ // 	this.spheres.push(new Models.Sphere(new Models.Vec3(30,12,2), 4));
+ // 	this.spheres.push(new Models.Sphere(new Models.Vec3(38,12,2), 4));
+ // 	this.spheres.push(new Models.Sphere(new Models.Vec3(46,12,2), 4));
+ // 	this.spheres.push(new Models.Sphere(new Models.Vec3(54,12,2), 4));
+ // 	this.spheres.push(new Models.Sphere(new Models.Vec3(62,12,2), 4));
  
- 	this.spheres.push(new Models.Sphere(new Models.Vec3(46,12,10), 4));
- 	this.spheres.push(new Models.Sphere(new Models.Vec3(46,12,18), 4));
- 	this.spheres.push(new Models.Sphere(new Models.Vec3(46,12,26), 4));
- 	this.spheres.push(new Models.Sphere(new Models.Vec3(46,12,34), 4));
+ // 	this.spheres.push(new Models.Sphere(new Models.Vec3(46,12,10), 4));
+ // 	this.spheres.push(new Models.Sphere(new Models.Vec3(46,12,18), 4));
+ // 	this.spheres.push(new Models.Sphere(new Models.Vec3(46,12,26), 4));
+ // 	this.spheres.push(new Models.Sphere(new Models.Vec3(46,12,34), 4));
  
- 	this.spheres.push(new Models.Sphere(new Models.Vec3(62,12,10), 4));
- 	this.spheres.push(new Models.Sphere(new Models.Vec3(62,12,18), 4));
- 	this.spheres.push(new Models.Sphere(new Models.Vec3(62,12,26), 4));
- 	this.spheres.push(new Models.Sphere(new Models.Vec3(62,12,34), 4));
+ // 	this.spheres.push(new Models.Sphere(new Models.Vec3(62,12,10), 4));
+ // 	this.spheres.push(new Models.Sphere(new Models.Vec3(62,12,18), 4));
+ // 	this.spheres.push(new Models.Sphere(new Models.Vec3(62,12,26), 4));
+ // 	this.spheres.push(new Models.Sphere(new Models.Vec3(62,12,34), 4));
   
-  	this.spheres.push(new Models.Sphere(new Models.Vec3(54,12,34), 4));
+ //  	this.spheres.push(new Models.Sphere(new Models.Vec3(54,12,34), 4));
 
-  	for (var i = 0; i < 30; ++i){
-		this.spheres.push(new Models.Sphere(new Models.Vec3(Utils.random(100,400), Utils.random(100,400), Utils.random(100,400)), Utils.random(3,8)));
-	}
-	for (var i = 0; i < 10; ++i){
-		new Utils.WorldGenerator(this, 40, new Models.Vec3(400,400,400)).generate();
-	}
+ //  	for (var i = 0; i < 30; ++i){
+	// 	this.spheres.push(new Models.Sphere(new Models.Vec3(Utils.random(100,400), Utils.random(100,400), Utils.random(100,400)), Utils.random(3,8)));
+	// }
+	// for (var i = 0; i < 10; ++i){
+	// 	new Utils.WorldGenerator(this, 40, new Models.Vec3(400,400,400)).generate();
+	// }
 
-	for (var x = 0; x < 10*8; x += 8){
-		for (var y = 0; y < 10*8; y += 8){
-			this.spheres.push(new Models.Sphere(new Models.Vec3(100+x,12,100+y), 4));
-		}
-	}
+	// for (var x = 0; x < 10*8; x += 8){
+	// 	for (var y = 0; y < 10*8; y += 8){
+	// 		this.spheres.push(new Models.Sphere(new Models.Vec3(100+x,12,100+y), 4));
+	// 	}
+	// }
 	console.log("initialized world with " + this.spheres.length + " spheres");
 }
 World.prototype.handleClientConnect = function(ws){

@@ -8,7 +8,7 @@ var GraphicsContext = function(){
 		near: 0.1,
 		far: 10000,
 	};
-	this.hideDistThreshhold = 150;
+	this.hideDistThreshhold = 100;
 
 	this.container = null;
 	this.renderer = null;

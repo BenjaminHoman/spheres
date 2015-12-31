@@ -160,7 +160,7 @@ Sphere.prototype.getPossibleOutSpheres = function(intersectingSpheres, packet){
 	return possibleOutSpheres;
 }
 Sphere.prototype.debug = function(){
-	console.log(JSON.stringify(this));
+	console.log(this.pos + " " + this.radius);
 }
 exports.Sphere = Sphere;
 
